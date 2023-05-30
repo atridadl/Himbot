@@ -1,6 +1,8 @@
 {
   "tasks": {
     "dev": "deno run --watch mod.ts",
-    "start": "deno run --allow-env --allow-net --allow-read --allow-write mod.ts"
+    "start": "deno run --allow-env --allow-net --allow-read --allow-write mod.ts",
+    "new:command": "cp ./examples/newCommand.txt ./src/commands/newCommand.ts",
+    "new:event": "cp ./examples/newEvent.txt ./src/events/newEvent.ts"
   }
 }
