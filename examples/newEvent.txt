@@ -1,0 +1,15 @@
+import { events } from "./mod.ts";
+import { logger } from "../utils/logger.ts";
+
+// Log the event name here
+const log = logger({ name: "Event: messageCreate" });
+
+/*
+  The properties of events are tied to specific discord events.
+  Please ensure that both the event type and the property (in this case message)
+  accurately reflect what you want to listen for.
+*/
+events.exampleEvent = (bot, message) => {
+  // In this example, the message contents are simply being logged
+  log.info(`${message.tag}: ${message.content}`);
+};

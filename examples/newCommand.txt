@@ -6,25 +6,31 @@ import {
 
 import { createCommand } from "./mod.ts";
 
-// Thanks for the bot name idea Wryna!
-
+// This is the command definition. Please ensure the name matches the file name
+// Also, make sure the description is meaningfull
 createCommand({
-  name: "wryna",
-  description: "What was your nickname in highschool?",
+  name: "command",
+  description: "This is an example command",
   type: ApplicationCommandTypes.ChatInput,
   scope: "Global",
   options: [
+    // This is an option that can be sent after the command and used for input
     {
       type: ApplicationCommandOptionTypes.String,
       name: "input",
       description: "Text you would like to send to this command.",
+      // This will make the option required
       required: true,
     },
   ],
   execute: async (bot, interaction) => {
+    // In this example, we only use "input", so we just need the one item from an array of length 1.
+    // Options always returns an array, even if there is a single element.
     const input = interaction.data?.options?.find(
       (option) => option.name === "input"
     );
+
+    // This is how the bot responds to interactions. In this case, it is via a reply.
     await bot.helpers.sendInteractionResponse(
       interaction.id,
       interaction.token,
