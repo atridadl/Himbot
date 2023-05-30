@@ -1,4 +1,4 @@
-# Himbot
+# HimBot
 
 A discord bot written in Typescript and running on the Deno runtime.
 
