@@ -16,12 +16,12 @@ To generate a new Command or Event run `deno task new:command` or `deno task new
 
 ## Running Locally
 
-- Copy .env.example and rename to .env
+- Copy `.env.example` and rename to `.env`
 - Create a Discord Bot with all gateway permissions enabled
-- Generate a token for this discord bot and paste it in the .env for BOT_TOKEN
+- Generate a token for this discord bot and paste it in the .env for `BOT_TOKEN`
 - Run `deno run --allow-all mod.ts` to run locally
 
 ## Adding the bot to a server
 
-Use the following link (replacing BOT_TOKEN with your own Token of course...) to add your bot:
+Use the following link (replacing `BOT_TOKEN` with your own Token of course...) to add your bot:
 https://discord.com/oauth2/authorize?client_id=BOT_TOKEN&scope=bot&permissions=8
