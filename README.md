@@ -4,8 +4,8 @@ A discord bot written in Typescript.
 
 ## It's dangerous to go alone! Take this!
 
--   Install Nodejs 16 or later [here](https://nodejs.org/en/download) (required)
--   The pnpm package manager `npn i -g pnpm` (recommended)
+-   Install Nodejs 18 or later [here](https://nodejs.org/en/download) (required)
+-   The pnpm package manager `npm i -g pnpm` (recommended)
 
 ## Structure
 
