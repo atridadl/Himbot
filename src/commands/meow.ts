@@ -3,7 +3,7 @@ import { Command } from '@sapphire/framework';
 import { Message } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
-	description: 'Borf! Borf!'
+	description: 'Meow!'
 })
 export class UserCommand extends Command {
 	// Register Chat Input and Context Menu command
@@ -17,24 +17,23 @@ export class UserCommand extends Command {
 
 	// Message command
 	public async messageRun(message: Message) {
-		return this.sendBorf(message);
+		return this.sendMeow(message);
 	}
 
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.sendBorf(interaction);
+		return this.sendMeow(interaction);
 	}
 
-	private async sendBorf(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction) {
-		const dogResponse = await fetch('https://dog.ceo/api/breeds/image/random');
-		const dogData = await dogResponse.json();
-
+	private async sendMeow(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction) {
+		const catResponse = await fetch('https://cataas.com/cat?json=true');
+		const catData = await catResponse.json();
 		interactionOrMessage instanceof Message
 			? await interactionOrMessage.channel.send({
-					content: dogData.status === 'success' ? dogData.message : 'Error: I had troubles fetching perfect puppies for you... :('
+					content: `https://cataas.com/${catData.url}`
 			  })
 			: await interactionOrMessage.reply({
-					content: 'success' ? dogData.message : 'Error: I had troubles fetching perfect puppies for you... :(',
+					content: `https://cataas.com/${catData.url}`,
 					fetchReply: true
 			  });
 	}
