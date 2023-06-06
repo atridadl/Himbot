@@ -17,15 +17,15 @@ export class UserCommand extends Command {
 
 	// Message command
 	public async messageRun(message: Message) {
-		return this.sendPing(message);
+		return this.sendBorf(message);
 	}
 
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.sendPing(interaction);
+		return this.sendBorf(interaction);
 	}
 
-	private async sendPing(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction) {
+	private async sendBorf(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction) {
 		const dogResponse = await fetch('https://dog.ceo/api/breeds/image/random');
 		const dogData = await dogResponse.json();
 		console.log(dogData);
