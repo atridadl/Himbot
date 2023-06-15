@@ -3,7 +3,7 @@ import { Command } from '@sapphire/framework';
 import { Message } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
-	description: 'Borf! Borf!'
+	description: 'Dad joke for daddies only!'
 })
 export class UserCommand extends Command {
 	// Register Chat Input and Context Menu command
@@ -17,24 +17,28 @@ export class UserCommand extends Command {
 
 	// Message command
 	public async messageRun(message: Message) {
-		return this.sendBorf(message);
+		return this.sendJoke(message);
 	}
 
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.sendBorf(interaction);
+		return this.sendJoke(interaction);
 	}
 
-	private async sendBorf(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction) {
-		const dogResponse = await fetch('https://dog.ceo/api/breeds/image/random');
-		const dogData = await dogResponse.json();
+	private async sendJoke(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction) {
+		const jokeResponse = await fetch('https://icanhazdadjoke.com/', {
+			headers: {
+				Accept: 'application/json'
+			}
+		});
+		const jokeData = await jokeResponse.json();
 
 		interactionOrMessage instanceof Message
 			? await interactionOrMessage.channel.send({
-					content: dogData.status === 'success' ? dogData.message : 'Error: I had troubles fetching perfect puppies for you... :('
+					content: jokeData.status === 200 ? jokeData.joke : '404 Joke Not Found'
 			  })
 			: await interactionOrMessage.reply({
-					content: dogData.status === 'success' ? dogData.message : 'Error: I had troubles fetching perfect puppies for you... :(',
+					content: jokeData.status === 200 ? jokeData.joke : '404 Joke Not Found',
 					fetchReply: true
 			  });
 	}
