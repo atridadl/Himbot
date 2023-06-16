@@ -1,5 +1,5 @@
 import './lib/setup';
-import { LogLevel, SapphireClient } from '@sapphire/framework';
+import { LogLevel, SapphireClient, BucketScope } from '@sapphire/framework';
 import { ActivityType, GatewayIntentBits } from 'discord.js';
 
 const client = new SapphireClient({
@@ -8,8 +8,8 @@ const client = new SapphireClient({
 		status: 'online',
 		activities: [
 			{
-				name: "I'm just here for the vibes my dudes...",
-				type: ActivityType.Playing
+				name: 'BOAT PARADE! BOAT PARADE! BOAT PARADE!',
+				type: ActivityType.Listening
 			}
 		]
 	},
@@ -18,7 +18,13 @@ const client = new SapphireClient({
 		level: LogLevel.Debug
 	},
 	intents: [GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMessages, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent],
-	loadMessageCommandListeners: true
+	loadMessageCommandListeners: true,
+	defaultCooldown: {
+		delay: 10_000,
+		filteredCommands: ['ping', 'wryna'],
+		limit: 2,
+		scope: BucketScope.Guild
+	}
 });
 
 const main = async () => {
