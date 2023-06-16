@@ -21,9 +21,7 @@ export class UserCommand extends Command {
 			builder //
 				.setName(this.name)
 				.setDescription(this.description)
-				.addStringOption((option) =>
-					option.setName('prompt').setDescription('You can ACTUALLY ask Himbot something! So cool!').setRequired(true)
-				)
+				.addStringOption((option) => option.setName('prompt').setDescription('Make a picture!').setRequired(true))
 		);
 	}
 
