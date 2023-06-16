@@ -43,7 +43,8 @@ export class UserCommand extends Command {
 
 		const chatCompletion = await openai.createChatCompletion({
 			model: 'gpt-3.5-turbo',
-			messages: [{ role: 'user', content: prompt }]
+			messages: [{ role: 'user', content: prompt }],
+			max_tokens: 1000
 		});
 
 		const content = chatCompletion.data.choices[0].message?.content || 'ERROR!';
