@@ -10,7 +10,9 @@ const openai = new OpenAIApi(configuration);
 
 @ApplyOptions<Command.Options>({
 	description: 'Make a picture!',
-	options: ['prompt']
+	options: ['prompt'],
+	cooldownDelay: 20_000,
+	cooldownLimit: 1
 })
 export class UserCommand extends Command {
 	// Register Chat Input and Context Menu command
