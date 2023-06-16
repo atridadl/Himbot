@@ -47,14 +47,14 @@ export class UserCommand extends Command {
 			max_tokens: 420
 		});
 
-		const content = chatCompletion.data.choices[0].message?.content || 'ERROR!';
+		const content = `Q: ${prompt}\nA: ${chatCompletion.data.choices[0].message?.content}`;
 
 		if (interactionOrMessage instanceof Message) {
-			return askMessage.edit({ content });
+			return askMessage.edit({ content: content.length <= 2000 ? content : 'Sorry... AI no work good...' });
 		}
 
 		return interactionOrMessage.editReply({
-			content: content
+			content: content.length <= 2000 ? content : 'Sorry... AI no work good...'
 		});
 	}
 }
