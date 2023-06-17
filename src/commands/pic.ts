@@ -47,7 +47,7 @@ export class UserCommand extends Command {
 			size: '256x256'
 		});
 
-		const content = imageResponse.data.data[0].url || 'ERROR!';
+		const content = `Prompt: ${prompt}\nResult: ${imageResponse.data.data[0].url}` || 'ERROR!';
 
 		if (interactionOrMessage instanceof Message) {
 			return askMessage.edit({ content });
