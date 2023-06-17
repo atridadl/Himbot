@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args, Command } from '@sapphire/framework';
-import { Message } from 'discord.js';
+import { Message, blockQuote, codeBlock } from 'discord.js';
 import { Configuration, OpenAIApi } from 'openai';
 
 const configuration = new Configuration({
@@ -43,11 +43,16 @@ export class UserCommand extends Command {
 
 		const chatCompletion = await openai.createChatCompletion({
 			model: 'gpt-3.5-turbo',
-			messages: [{ role: 'user', content: prompt }],
+			messages: [
+				{
+					role: 'user',
+					content: `${prompt}. In your response, please replace "As an AI language model" with "As HimBot, the coolest bot ever"`
+				}
+			],
 			max_tokens: 420
 		});
 
-		const content = `Q: ${prompt}\nA: ${chatCompletion.data.choices[0].message?.content}`;
+		const content = blockQuote(`> ${prompt}\n${codeBlock(`${chatCompletion.data.choices[0].message?.content}`)}`);
 
 		if (interactionOrMessage instanceof Message) {
 			return askMessage.edit({ content: content.length <= 2000 ? content : 'Sorry... AI no work good...' });
