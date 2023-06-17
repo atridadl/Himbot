@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Args, Command } from '@sapphire/framework';
+import { Args, BucketScope, Command } from '@sapphire/framework';
 import { Message } from 'discord.js';
 import { Configuration, OpenAIApi } from 'openai';
 
@@ -11,9 +11,12 @@ const openai = new OpenAIApi(configuration);
 @ApplyOptions<Command.Options>({
 	description: 'Make a picture!',
 	options: ['prompt'],
+	// 10mins
 	cooldownDelay: 600_000,
 	cooldownLimit: 1,
-	cooldownFilteredUsers: ['himbothyswaggins']
+	// Yes... I did hardcode myself.
+	cooldownFilteredUsers: ['himbothyswaggins'],
+	cooldownScope: BucketScope.User
 })
 export class UserCommand extends Command {
 	// Register Chat Input and Context Menu command

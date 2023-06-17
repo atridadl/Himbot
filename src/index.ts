@@ -20,10 +20,13 @@ const client = new SapphireClient({
 	intents: [GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMessages, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent],
 	loadMessageCommandListeners: true,
 	defaultCooldown: {
+		// 10s
 		delay: 10_000,
 		filteredCommands: ['ping', 'wryna'],
 		limit: 2,
-		scope: BucketScope.Guild
+		// Yes... I did hardcode myself.
+		filteredUsers: ['himbothyswaggins'],
+		scope: BucketScope.User
 	}
 });
 
