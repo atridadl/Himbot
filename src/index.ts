@@ -22,7 +22,7 @@ const client = new SapphireClient({
 	defaultCooldown: {
 		// 10s
 		delay: 10_000,
-		filteredCommands: ['ping', 'wryna'],
+		filteredCommands: ['himbothyswaggins', 'HimbothySwaggins', 'HimbothySwaggins#4006'],
 		limit: 2,
 		// Yes... I did hardcode myself.
 		filteredUsers: ['himbothyswaggins'],
