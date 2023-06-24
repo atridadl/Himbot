@@ -15,7 +15,7 @@ const openai = new OpenAIApi(configuration);
 	cooldownDelay: 600_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
-	cooldownFilteredUsers: ['himbothyswaggins'],
+	cooldownFilteredUsers: ['himbothyswaggins', 'HimbothySwaggins', 'HimbothySwaggins#4006'],
 	cooldownScope: BucketScope.User
 })
 export class UserCommand extends Command {
