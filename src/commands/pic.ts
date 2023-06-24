@@ -70,7 +70,7 @@ export class UserCommand extends Command {
 		}
 
 		if (!response.ok) {
-			const content = `Prompt: ${prompt}` || 'ERROR!';
+			const content = `Sorry! I goofed up. Please ask my maker HimbothySwaggins about what could have happened!`;
 
 			if (interactionOrMessage instanceof Message) {
 				return askMessage.edit({ content });
