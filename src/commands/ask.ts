@@ -46,7 +46,7 @@ export class UserCommand extends Command {
 			messages: [
 				{
 					role: 'user',
-					content: `${prompt}. In your response, please replace "As an AI language model" with "As HimBot, the coolest bot ever"`
+					content: prompt
 				}
 			],
 			max_tokens: 420
