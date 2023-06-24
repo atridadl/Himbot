@@ -1,12 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args, BucketScope, Command } from '@sapphire/framework';
-import { Message } from 'discord.js';
-import { Configuration, OpenAIApi } from 'openai';
-
-const configuration = new Configuration({
-	apiKey: process.env.OPENAI_API_KEY
-});
-const openai = new OpenAIApi(configuration);
+import { AttachmentBuilder, Message } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
 	description: 'Make a picture!',
@@ -45,20 +39,60 @@ export class UserCommand extends Command {
 				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
 				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
-		const imageResponse = await openai.createImage({
-			prompt,
-			n: 1,
-			size: '512x512'
+		const response = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-beta-v2-2-2/text-to-image`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: 'application/json',
+				Authorization: `Bearer ${process.env.STABILITY_API_KEY}`
+			},
+			body: JSON.stringify({
+				text_prompts: [
+					{
+						text: prompt
+					}
+				],
+				cfg_scale: 7,
+				clip_guidance_preset: 'FAST_BLUE',
+				height: 512,
+				width: 512,
+				samples: 1,
+				steps: 50
+			})
 		});
 
-		const content = `Prompt: ${prompt}\nResult: ${imageResponse.data.data[0].url}` || 'ERROR!';
-
-		if (interactionOrMessage instanceof Message) {
-			return askMessage.edit({ content });
+		interface GenerationResponse {
+			artifacts: Array<{
+				base64: string;
+				seed: number;
+				finishReason: string;
+			}>;
 		}
 
-		return interactionOrMessage.editReply({
-			content: content
-		});
+		if (!response.ok) {
+			const content = `Prompt: ${prompt}` || 'ERROR!';
+
+			if (interactionOrMessage instanceof Message) {
+				return askMessage.edit({ content });
+			}
+
+			return interactionOrMessage.editReply({
+				content: content
+			});
+		} else {
+			const responseJSON = (await response.json()) as GenerationResponse;
+			const imageAttachment = new AttachmentBuilder(Buffer.from(responseJSON.artifacts[0].base64, 'base64'));
+
+			const content = `Prompt: ${prompt}` || 'ERROR!';
+
+			if (interactionOrMessage instanceof Message) {
+				return askMessage.edit({ content, files: [imageAttachment] });
+			}
+
+			return interactionOrMessage.editReply({
+				content: content,
+				files: [imageAttachment]
+			});
+		}
 	}
 }
