@@ -48,7 +48,7 @@ export class UserCommand extends Command {
 		const imageResponse = await openai.createImage({
 			prompt,
 			n: 1,
-			size: '256x256'
+			size: '512x512'
 		});
 
 		const content = `Prompt: ${prompt}\nResult: ${imageResponse.data.data[0].url}` || 'ERROR!';
