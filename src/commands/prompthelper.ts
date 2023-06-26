@@ -9,7 +9,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 @ApplyOptions<Command.Options>({
-	description: 'You can ACTUALLY ask Himbot something! So cool!',
+	description: 'AI will help you with AI!',
 	options: ['prompt']
 })
 export class UserCommand extends Command {
@@ -19,23 +19,24 @@ export class UserCommand extends Command {
 			builder //
 				.setName(this.name)
 				.setDescription(this.description)
-				.addStringOption((option) =>
-					option.setName('prompt').setDescription('You can ACTUALLY ask Himbot something! So cool!').setRequired(true)
-				)
+				.addStringOption((option) => option.setName('prompt').setDescription('AI will help you with AI!').setRequired(true))
 		);
 	}
 
 	// Message command
 	public async messageRun(message: Message, args: Args) {
-		return this.ask(message, args.getOption('prompt') || message.content.split('!wryna ')[1]);
+		return this.promptHelper(message, args.getOption('prompt') || message.content.split('!wryna ')[1]);
 	}
 
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.ask(interaction, interaction.options.getString('prompt') || 'NOTHING');
+		return this.promptHelper(interaction, interaction.options.getString('prompt') || 'NOTHING');
 	}
 
-	private async ask(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction, prompt: string) {
+	private async promptHelper(
+		interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction,
+		prompt: string
+	) {
 		const askMessage =
 			interactionOrMessage instanceof Message
 				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
@@ -46,7 +47,7 @@ export class UserCommand extends Command {
 			messages: [
 				{
 					role: 'user',
-					content: prompt
+					content: `Can you optimize the following prompt to be used for an image generation model?: ${prompt}`
 				}
 			]
 		});
