@@ -6,7 +6,7 @@ import { AttachmentBuilder, Message } from 'discord.js';
 	description: 'Make a picture!',
 	options: ['prompt'],
 	// 10mins
-	cooldownDelay: 60_000,
+	cooldownDelay: 300_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
 	cooldownFilteredUsers: ['himbothyswaggins', 'HimbothySwaggins', 'HimbothySwaggins#4006'],
