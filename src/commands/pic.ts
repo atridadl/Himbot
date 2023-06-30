@@ -16,7 +16,7 @@ export class UserCommand extends Command {
 	// Register Chat Input and Context Menu command
 	public override registerApplicationCommands(registry: Command.Registry) {
 		registry.registerChatInputCommand((builder) =>
-			builder //
+			builder
 				.setName(this.name)
 				.setDescription(this.description)
 				.addStringOption((option) => option.setName('prompt').setDescription('Make a picture!').setRequired(true))

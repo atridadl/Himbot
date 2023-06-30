@@ -8,11 +8,7 @@ import { Message } from 'discord.js';
 export class UserCommand extends Command {
 	// Register Chat Input and Context Menu command
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder) =>
-			builder //
-				.setName(this.name)
-				.setDescription(this.description)
-		);
+		registry.registerChatInputCommand((builder) => builder.setName(this.name).setDescription(this.description));
 	}
 
 	// Message command
