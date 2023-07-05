@@ -9,7 +9,7 @@ import { AttachmentBuilder, Message } from 'discord.js';
 	cooldownDelay: 300_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
-	cooldownFilteredUsers: ['himbothyswaggins', 'HimbothySwaggins', 'HimbothySwaggins#4006'],
+	cooldownFilteredUsers: ['83679718401904640'],
 	cooldownScope: BucketScope.User
 })
 export class UserCommand extends Command {
