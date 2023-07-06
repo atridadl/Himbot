@@ -39,7 +39,7 @@ export class UserCommand extends Command {
 				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
 				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
-		const response = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-beta-v2-2-2/text-to-image`, {
+		const response = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v0-9/text-to-image`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -52,12 +52,12 @@ export class UserCommand extends Command {
 						text: prompt
 					}
 				],
-				cfg_scale: 7,
+				cfg_scale: 6,
 				clip_guidance_preset: 'FAST_BLUE',
-				height: 512,
-				width: 512,
+				height: 1024,
+				width: 1024,
 				samples: 1,
-				steps: 50
+				steps: 45
 			})
 		});
 
