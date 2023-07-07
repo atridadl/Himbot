@@ -5,10 +5,10 @@ import { AttachmentBuilder, Message } from 'discord.js';
 // This is literally the worlds messiest TS code. Please don't judge me...
 
 @ApplyOptions<Command.Options>({
-	description: 'Make a picture!',
+	description: 'Make a picture... but high res!',
 	options: ['prompt'],
 	// 10mins
-	cooldownDelay: 100_000,
+	cooldownDelay: 300_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
 	cooldownFilteredUsers: ['83679718401904640'],
@@ -21,21 +21,21 @@ export class UserCommand extends Command {
 			builder
 				.setName(this.name)
 				.setDescription(this.description)
-				.addStringOption((option) => option.setName('prompt').setDescription('Make a picture!').setRequired(true))
+				.addStringOption((option) => option.setName('prompt').setDescription('Make a picture... but high res!').setRequired(true))
 		);
 	}
 
 	// Message command
 	public async messageRun(message: Message, args: Args) {
-		return this.pic(message, args.getOption('prompt') || message.content.split('!pic ')[1]);
+		return this.picHr(message, args.getOption('prompt') || message.content.split('!pic_hr ')[1]);
 	}
 
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.pic(interaction, interaction.options.getString('prompt') || 'NOTHING');
+		return this.picHr(interaction, interaction.options.getString('prompt') || 'NOTHING');
 	}
 
-	private async pic(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction, prompt: string) {
+	private async picHr(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction, prompt: string) {
 		const askMessage =
 			interactionOrMessage instanceof Message
 				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
@@ -52,7 +52,7 @@ export class UserCommand extends Command {
 		const balance = (await creditCountResponse.json()).credits || 0;
 
 		if (balance > 5) {
-			const imageGenResponse = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-beta-v2-2-2/text-to-image`, {
+			const imageGenResponse = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v0-9/text-to-image`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -67,8 +67,8 @@ export class UserCommand extends Command {
 					],
 					cfg_scale: 6,
 					clip_guidance_preset: 'FAST_BLUE',
-					height: 512,
-					width: 512,
+					height: 1024,
+					width: 1024,
 					samples: 1,
 					steps: 32
 				})
