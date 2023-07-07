@@ -27,7 +27,7 @@ export class UserCommand extends Command {
 
 	// Message command
 	public async messageRun(message: Message, args: Args) {
-		return this.picHr(message, args.getOption('prompt') || message.content.split('!pic_hr ')[1]);
+		return this.picHr(message, args.getOption('prompt') || message.content.split('!fancypic ')[1]);
 	}
 
 	// Chat Input (slash) command
