@@ -97,8 +97,8 @@ export class UserCommand extends Command {
 				const content =
 					`Prompt: ${prompt}${
 						balance &&
-						balance <= 200 &&
-						`\n\n... also, we are now at ${balance} credits. If you'd like to help fund this command, please type "/support" for details!`
+						balance <= 300 &&
+						`\n\n⚠️I am now at ${balance} credits. If you'd like to help fund this command, please type "/support" for details!`
 					}` || 'ERROR!';
 
 				if (interactionOrMessage instanceof Message) {
