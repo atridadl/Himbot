@@ -39,38 +39,79 @@ export class UserCommand extends Command {
 				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
 				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
-		const response = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v0-9/text-to-image`, {
-			method: 'POST',
+		const creditCountResponse = await fetch(`https://api.stability.ai/v1/user/balance`, {
+			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				Accept: 'application/json',
 				Authorization: `Bearer ${process.env.STABILITY_API_KEY}`
-			},
-			body: JSON.stringify({
-				text_prompts: [
-					{
-						text: prompt
-					}
-				],
-				cfg_scale: 6,
-				clip_guidance_preset: 'FAST_BLUE',
-				height: 1024,
-				width: 1024,
-				samples: 1,
-				steps: 32
-			})
+			}
 		});
 
-		interface GenerationResponse {
-			artifacts: Array<{
-				base64: string;
-				seed: number;
-				finishReason: string;
-			}>;
-		}
+		const balance = (await creditCountResponse.json()).credits || 0;
 
-		if (!response.ok) {
-			const content = `Sorry! I goofed up. Please ask my maker HimbothySwaggins about what could have happened!`;
+		if (balance > 5) {
+			const imageGenResponse = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v0-9/text-to-image`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+					Authorization: `Bearer ${process.env.STABILITY_API_KEY}`
+				},
+				body: JSON.stringify({
+					text_prompts: [
+						{
+							text: prompt
+						}
+					],
+					cfg_scale: 6,
+					clip_guidance_preset: 'FAST_BLUE',
+					height: 1024,
+					width: 1024,
+					samples: 1,
+					steps: 32
+				})
+			});
+
+			interface GenerationResponse {
+				artifacts: Array<{
+					base64: string;
+					seed: number;
+					finishReason: string;
+				}>;
+			}
+
+			if (!imageGenResponse.ok) {
+				const content = `Sorry! I goofed up. Please ask my maker HimbothySwaggins about what could have happened!`;
+
+				if (interactionOrMessage instanceof Message) {
+					return askMessage.edit({ content });
+				}
+
+				return interactionOrMessage.editReply({
+					content: content
+				});
+			} else {
+				const responseJSON = (await imageGenResponse.json()) as GenerationResponse;
+				const imageAttachment = new AttachmentBuilder(Buffer.from(responseJSON.artifacts[0].base64, 'base64'));
+
+				const content =
+					`Prompt: ${prompt}${
+						balance &&
+						balance <= 200 &&
+						`\n\n... also, we are now at ${balance} credits. If you'd like to help fund this command, please type "/support" for details!`
+					}` || 'ERROR!';
+
+				if (interactionOrMessage instanceof Message) {
+					return askMessage.edit({ content, files: [imageAttachment] });
+				}
+
+				return interactionOrMessage.editReply({
+					content: content,
+					files: [imageAttachment]
+				});
+			}
+		} else {
+			const content = `Oops! We're out of credits for this. If you'd like to help fund this command, please type "/support" for details!`;
 
 			if (interactionOrMessage instanceof Message) {
 				return askMessage.edit({ content });
@@ -78,20 +119,6 @@ export class UserCommand extends Command {
 
 			return interactionOrMessage.editReply({
 				content: content
-			});
-		} else {
-			const responseJSON = (await response.json()) as GenerationResponse;
-			const imageAttachment = new AttachmentBuilder(Buffer.from(responseJSON.artifacts[0].base64, 'base64'));
-
-			const content = `Prompt: ${prompt}` || 'ERROR!';
-
-			if (interactionOrMessage instanceof Message) {
-				return askMessage.edit({ content, files: [imageAttachment] });
-			}
-
-			return interactionOrMessage.editReply({
-				content: content,
-				files: [imageAttachment]
 			});
 		}
 	}
