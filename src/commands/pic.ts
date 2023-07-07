@@ -57,7 +57,7 @@ export class UserCommand extends Command {
 				height: 1024,
 				width: 1024,
 				samples: 1,
-				steps: 45
+				steps: 32
 			})
 		});
 
