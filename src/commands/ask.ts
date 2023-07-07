@@ -27,7 +27,7 @@ export class UserCommand extends Command {
 
 	// Message command
 	public async messageRun(message: Message, args: Args) {
-		return this.ask(message, args.getOption('prompt') || message.content.split('!wryna ')[1]);
+		return this.ask(message, args.getOption('prompt') || message.content.split('!ask ')[1]);
 	}
 
 	// Chat Input (slash) command

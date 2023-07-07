@@ -2,6 +2,8 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Args, BucketScope, Command } from '@sapphire/framework';
 import { AttachmentBuilder, Message } from 'discord.js';
 
+// This is literally the worlds messiest TS code. Please don't judge me...
+
 @ApplyOptions<Command.Options>({
 	description: 'Make a picture!',
 	options: ['prompt'],
@@ -25,7 +27,7 @@ export class UserCommand extends Command {
 
 	// Message command
 	public async messageRun(message: Message, args: Args) {
-		return this.pic(message, args.getOption('prompt') || message.content.split('!wryna ')[1]);
+		return this.pic(message, args.getOption('prompt') || message.content.split('!pic ')[1]);
 	}
 
 	// Chat Input (slash) command
@@ -94,11 +96,21 @@ export class UserCommand extends Command {
 				const responseJSON = (await imageGenResponse.json()) as GenerationResponse;
 				const imageAttachment = new AttachmentBuilder(Buffer.from(responseJSON.artifacts[0].base64, 'base64'));
 
+				const newCreditCountResponse = await fetch(`https://api.stability.ai/v1/user/balance`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${process.env.STABILITY_API_KEY}`
+					}
+				});
+
+				const newBalance = (await newCreditCountResponse.json()).credits || 0;
+
 				const content =
-					`Prompt: ${prompt}${
-						balance &&
-						balance <= 300 &&
-						`\n\n⚠️I am now at ${balance} credits. If you'd like to help fund this command, please type "/support" for details!`
+					`Credits Used: ${balance - newBalance}\nPrompt: ${prompt}${
+						balance <= 300
+							? `\n\n⚠️I am now at ${balance} credits. If you'd like to help fund this command, please type "/support" for details!`
+							: ''
 					}` || 'ERROR!';
 
 				if (interactionOrMessage instanceof Message) {
