@@ -6,7 +6,7 @@ import { AttachmentBuilder, Message } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
 	description: 'Make a picture!',
-	options: ['prompt'],
+	options: ['prompt', 'amount'],
 	// 10mins
 	cooldownDelay: 100_000,
 	cooldownLimit: 1,
@@ -21,21 +21,42 @@ export class UserCommand extends Command {
 			builder
 				.setName(this.name)
 				.setDescription(this.description)
-				.addStringOption((option) => option.setName('prompt').setDescription('Make a picture!').setRequired(true))
+				.addStringOption((option) =>
+					option.setName('prompt').setDescription('The prompt you will use to generate an image!').setRequired(true)
+				)
+				.addStringOption((option) =>
+					option
+						.setName('amount')
+						.setDescription('The number of images you would like to generate. Maximum 4.')
+						.setChoices(
+							...[
+								{ name: '1', value: '1' },
+								{ name: '2', value: '2' },
+								{ name: '3', value: '3' },
+								{ name: '4', value: '4' }
+							]
+						)
+				)
 		);
 	}
 
 	// Message command
 	public async messageRun(message: Message, args: Args) {
-		return this.pic(message, args.getOption('prompt') || message.content.split('!pic ')[1]);
+		const amount = Math.abs(Number(args.getOption('amount')));
+		return this.pic(message, args.getOption('prompt') || 'Scold me for not passing any prompt in.', amount <= 4 ? amount : 1);
 	}
 
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.pic(interaction, interaction.options.getString('prompt') || 'NOTHING');
+		const amount = Number(interaction.options.getString('amount'));
+		return this.pic(interaction, interaction.options.getString('prompt') || 'NOTHING', amount || 1);
 	}
 
-	private async pic(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction, prompt: string) {
+	private async pic(
+		interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction,
+		prompt: string,
+		amount: number
+	) {
 		const askMessage =
 			interactionOrMessage instanceof Message
 				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
@@ -69,8 +90,9 @@ export class UserCommand extends Command {
 					clip_guidance_preset: 'FAST_BLUE',
 					height: 512,
 					width: 512,
-					samples: 1,
-					steps: 32
+					samples: amount,
+					steps: 32,
+					seed: Number(String(interactionOrMessage.member?.user.id).substring(0, 5)) || 0
 				})
 			});
 
@@ -94,7 +116,11 @@ export class UserCommand extends Command {
 				});
 			} else {
 				const responseJSON = (await imageGenResponse.json()) as GenerationResponse;
-				const imageAttachment = new AttachmentBuilder(Buffer.from(responseJSON.artifacts[0].base64, 'base64'));
+				const imageAttachment: AttachmentBuilder[] = [];
+
+				for (let i = 0; i < responseJSON.artifacts.length; i++) {
+					imageAttachment.push(new AttachmentBuilder(Buffer.from(responseJSON.artifacts[i].base64, 'base64')));
+				}
 
 				const newCreditCountResponse = await fetch(`https://api.stability.ai/v1/user/balance`, {
 					method: 'GET',
@@ -114,12 +140,12 @@ export class UserCommand extends Command {
 					}` || 'ERROR!';
 
 				if (interactionOrMessage instanceof Message) {
-					return askMessage.edit({ content, files: [imageAttachment] });
+					return askMessage.edit({ content, files: imageAttachment });
 				}
 
 				return interactionOrMessage.editReply({
 					content: content,
-					files: [imageAttachment]
+					files: imageAttachment
 				});
 			}
 		} else {
