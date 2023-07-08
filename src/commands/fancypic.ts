@@ -116,7 +116,7 @@ export class UserCommand extends Command {
 				const responseJSON = (await imageGenResponse.json()) as GenerationResponse;
 				const imageAttachment: AttachmentBuilder[] = [];
 
-				for (let i = 0; i < responseJSON.artifacts.length - 1; i++) {
+				for (let i = 0; i < responseJSON.artifacts.length; i++) {
 					imageAttachment.push(new AttachmentBuilder(Buffer.from(responseJSON.artifacts[i].base64, 'base64')));
 				}
 
