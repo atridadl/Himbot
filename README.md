@@ -27,9 +27,9 @@ https://discord.com/oauth2/authorize?client_id=DISCORD_CLIENT_ID&scope=bot&permi
 
 ## Commands
 
-### ask
+### **ask**
 
-### Description
+##### Description
 
 A command that returns the answer to your prompt for OpenAI's GPT 3.5 turbo model.
 
@@ -37,9 +37,9 @@ A command that returns the answer to your prompt for OpenAI's GPT 3.5 turbo mode
 
 `/ask prompt:prompt_text`
 
-### borf
+### **borf**
 
-### Description
+#### Description
 
 A command that returns a random picture of a dog.
 
@@ -47,9 +47,9 @@ A command that returns a random picture of a dog.
 
 `/borf`
 
-### credits
+### **credits**
 
-### Description
+#### Description
 
 A command that returns number of Stable Diffusion credits that are available.
 
@@ -57,9 +57,9 @@ A command that returns number of Stable Diffusion credits that are available.
 
 `/credits`
 
-### dad
+### **dad**
 
-### Description
+#### Description
 
 A command that returns a random dad joke.
 
@@ -67,9 +67,9 @@ A command that returns a random dad joke.
 
 `/dad`
 
-### disclosure
+### **disclosure**
 
-### Description
+#### Description
 
 A command that a disclosure statement for data processing.
 
@@ -77,9 +77,9 @@ A command that a disclosure statement for data processing.
 
 `/disclosure`
 
-### fancypic
+### **fancypic**
 
-### Description
+#### Description
 
 A command that returns 1-2 AI generated images using the SDXL 0.9 model.
 
@@ -87,9 +87,9 @@ A command that returns 1-2 AI generated images using the SDXL 0.9 model.
 
 `/fancypic prompt:prompt_text amount:1`
 
-### meow
+### **meow**
 
-### Description
+#### Description
 
 A command that returns a random picture of a cat.
 
@@ -97,9 +97,9 @@ A command that returns a random picture of a cat.
 
 `/meow`
 
-### pic
+### **pic**
 
-### Description
+#### Description
 
 A command that returns 1-4 AI generated images using the SDXL beta model.
 
@@ -107,9 +107,9 @@ A command that returns 1-4 AI generated images using the SDXL beta model.
 
 `/pic prompt:prompt_text amount:1`
 
-### ping
+### **ping**
 
-### Description
+#### Description
 
 A command that returns the latency for the bot, and the latency for the Discord API. Useful for bot debugging.
 
@@ -117,9 +117,9 @@ A command that returns the latency for the bot, and the latency for the Discord 
 
 `/ping`
 
-### quack
+### **quack**
 
-### Description
+#### Description
 
 A command that returns a random picture of a duck.
 
@@ -127,9 +127,9 @@ A command that returns a random picture of a duck.
 
 `/quack`
 
-### support
+### **support**
 
-### Description
+#### Description
 
 A command that returns a Stripe link that can be used to fund credits for the AI commands.
 
@@ -137,9 +137,9 @@ A command that returns a Stripe link that can be used to fund credits for the AI
 
 `/support`
 
-### wryna
+### **wryna**
 
-### Description
+#### Description
 
 A command that returns "my nickname in highschool" response given your prompt
 
