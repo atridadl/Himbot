@@ -3,7 +3,7 @@ import { Command } from '@sapphire/framework';
 import { Message } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
-	description: 'Make a picture!'
+	description: 'Check how many credits I have left!'
 })
 export class UserCommand extends Command {
 	// Register Chat Input and Context Menu command
