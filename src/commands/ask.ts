@@ -54,11 +54,23 @@ export class UserCommand extends Command {
 		const content = blockQuote(`> ${prompt}\n${codeBlock(`${chatCompletion.data.choices[0].message?.content}`)}`);
 
 		if (interactionOrMessage instanceof Message) {
-			return askMessage.edit({ content: content.length <= 2000 ? content : 'Sorry... AI no work good...' });
+			return askMessage.edit({
+				content:
+					content.length < 2000
+						? content
+						: `Oops! Discord only allows messages with 2000 characters or less. The prompt used ${
+								prompt.length
+						  } characters and the response took ${content.length - prompt.length}`
+			});
 		}
 
 		return interactionOrMessage.editReply({
-			content: content.length <= 2000 ? content : 'Sorry... AI no work good...'
+			content:
+				content.length < 2000
+					? content
+					: `Oops! Discord only allows messages with 2000 characters or less. The prompt used ${
+							prompt.length
+					  } characters and the response took ${content.length - prompt.length}`
 		});
 	}
 }
