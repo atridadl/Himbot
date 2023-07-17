@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args, Command } from '@sapphire/framework';
-import { Message, blockQuote, codeBlock } from 'discord.js';
+import { AttachmentBuilder, Message, blockQuote, codeBlock } from 'discord.js';
 import { Configuration, OpenAIApi } from 'openai';
 
 const configuration = new Configuration({
@@ -53,14 +53,24 @@ export class UserCommand extends Command {
 
 		const content = blockQuote(`> ${prompt}\n${codeBlock(`${chatCompletion.data.choices[0].message?.content}`)}`);
 
+		const messageAttachment: AttachmentBuilder[] = [];
+
+		if (content.length > 2000) {
+			messageAttachment.push(
+				new AttachmentBuilder(Buffer.from(`> ${prompt}\n${`${chatCompletion.data.choices[0].message?.content}`}`, 'utf-8'), {
+					name: 'response.txt',
+					description: "Himbot's Response"
+				})
+			);
+		}
+
 		if (interactionOrMessage instanceof Message) {
 			return askMessage.edit({
 				content:
 					content.length < 2000
 						? content
-						: `Oops! Discord only allows messages with 2000 characters or less. The prompt used ${
-								prompt.length
-						  } characters and the response took ${content.length - prompt.length}`
+						: `Discord only allows messages with 2000 characters or less. Please see your response in the attached file!`,
+				files: messageAttachment
 			});
 		}
 
@@ -68,9 +78,8 @@ export class UserCommand extends Command {
 			content:
 				content.length < 2000
 					? content
-					: `Oops! Discord only allows messages with 2000 characters or less. The prompt used ${
-							prompt.length
-					  } characters and the response took ${content.length - prompt.length}`
+					: `Discord only allows messages with 2000 characters or less. Please see your response in the attached file!`,
+			files: messageAttachment
 		});
 	}
 }

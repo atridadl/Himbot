@@ -144,7 +144,7 @@ export class UserCommand extends Command {
 				}
 
 				return interactionOrMessage.editReply({
-					content: content,
+					content,
 					files: imageAttachment
 				});
 			}
