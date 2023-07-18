@@ -119,7 +119,12 @@ export class UserCommand extends Command {
 				const imageAttachment: AttachmentBuilder[] = [];
 
 				for (let i = 0; i < responseJSON.artifacts.length; i++) {
-					imageAttachment.push(new AttachmentBuilder(Buffer.from(responseJSON.artifacts[i].base64, 'base64')));
+					imageAttachment.push(
+						new AttachmentBuilder(Buffer.from(responseJSON.artifacts[i].base64, 'base64'), {
+							name: 'response.jpg',
+							description: "Himbot's Response"
+						})
+					);
 				}
 
 				const newCreditCountResponse = await fetch(`https://api.stability.ai/v1/user/balance`, {
