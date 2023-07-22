@@ -105,7 +105,7 @@ export class UserCommand extends Command {
 			}
 
 			if (!imageGenResponse.ok) {
-				const content = `Sorry! I goofed up. Please ask my maker HimbothySwaggins about what could have happened!`;
+				const content = `Sorry, I can't complete the prompt for: ${prompt}`;
 
 				if (interactionOrMessage instanceof Message) {
 					return askMessage.edit({ content });
