@@ -71,7 +71,7 @@ export class UserCommand extends Command {
 		const balance = (await creditCountResponse.json()).credits || 0;
 
 		if (balance > 5) {
-			const imageGenResponse = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v0-9/text-to-image`, {
+			const imageGenResponse = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
