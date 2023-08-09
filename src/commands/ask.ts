@@ -42,7 +42,7 @@ export class UserCommand extends Command {
 				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
 		const chatCompletion = await openai.createChatCompletion({
-			model: 'gpt-3.5-turbo',
+			model: 'gpt-4',
 			messages: [
 				{
 					role: 'user',
