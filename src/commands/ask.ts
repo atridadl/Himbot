@@ -1,12 +1,11 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args, Command } from '@sapphire/framework';
 import { AttachmentBuilder, Message, blockQuote, codeBlock } from 'discord.js';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY
 });
-const openai = new OpenAIApi(configuration);
 
 @ApplyOptions<Command.Options>({
 	description: 'You can ACTUALLY ask Himbot something! So cool!',
@@ -41,7 +40,7 @@ export class UserCommand extends Command {
 				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
 				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
-		const chatCompletion = await openai.createChatCompletion({
+		const chatCompletion = await openai.chat.completions.create({
 			model: 'gpt-4',
 			messages: [
 				{
@@ -51,13 +50,13 @@ export class UserCommand extends Command {
 			]
 		});
 
-		const content = blockQuote(`> ${prompt}\n${codeBlock(`${chatCompletion.data.choices[0].message?.content}`)}`);
+		const content = blockQuote(`> ${prompt}\n${codeBlock(`${chatCompletion.choices[0].message?.content}`)}`);
 
 		const messageAttachment: AttachmentBuilder[] = [];
 
 		if (content.length > 2000) {
 			messageAttachment.push(
-				new AttachmentBuilder(Buffer.from(`> ${prompt}\n${`${chatCompletion.data.choices[0].message?.content}`}`, 'utf-8'), {
+				new AttachmentBuilder(Buffer.from(`> ${prompt}\n${`${chatCompletion.choices[0].message?.content}`}`, 'utf-8'), {
 					name: 'response.txt',
 					description: "Himbot's Response"
 				})
