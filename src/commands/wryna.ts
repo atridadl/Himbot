@@ -2,6 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Args, Command } from '@sapphire/framework';
 import { Message } from 'discord.js';
 
+// @ts-ignore
 @ApplyOptions<Command.Options>({
 	description: 'This command was your nickname in highschool!',
 	options: ['nickname']

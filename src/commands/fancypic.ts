@@ -4,6 +4,7 @@ import { AttachmentBuilder, Message } from 'discord.js';
 
 // This is literally the worlds messiest TS code. Please don't judge me...
 
+// @ts-ignore
 @ApplyOptions<Command.Options>({
 	description: 'Make a picture... but high res!',
 	options: ['prompt', 'number of pictures'],

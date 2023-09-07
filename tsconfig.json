@@ -1,6 +1,7 @@
 {
 	"extends": "@sapphire/ts-config",
 	"compilerOptions": {
+		"ignoreDeprecations": "5.0",
 		"rootDir": "src",
 		"outDir": "dist",
 		"tsBuildInfoFile": "dist/.tsbuildinfo"

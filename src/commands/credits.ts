@@ -2,6 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
 import { Message } from 'discord.js';
 
+// @ts-ignore
 @ApplyOptions<Command.Options>({
 	description: 'Check how many credits I have left!'
 })

@@ -7,6 +7,8 @@ const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY
 });
 
+// @ts-ignore
+// @ts-ignore
 @ApplyOptions<Command.Options>({
 	description: 'You can ACTUALLY ask Himbot something! So cool!',
 	options: ['prompt']

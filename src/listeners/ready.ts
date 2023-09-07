@@ -4,6 +4,7 @@ import { blue, gray, green, magenta, magentaBright, white, yellow } from 'colore
 
 const dev = process.env.NODE_ENV !== 'production';
 
+// @ts-ignore
 @ApplyOptions<Listener.Options>({ once: true })
 export class UserEvent extends Listener {
 	private readonly style = dev ? yellow : blue;
