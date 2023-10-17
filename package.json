@@ -20,6 +20,7 @@
 		"openai": "^4.5.0"
 	},
 	"devDependencies": {
+		"@flydotio/dockerfile": "^0.4.10",
 		"@sapphire/cli": "^1.6.1",
 		"@sapphire/prettier-config": "^2.0.0",
 		"@sapphire/ts-config": "^5.0.0",
