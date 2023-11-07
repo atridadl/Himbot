@@ -8,7 +8,6 @@ const openai = new OpenAI({
 });
 
 // @ts-ignore
-// @ts-ignore
 @ApplyOptions<Command.Options>({
 	description: 'You can ACTUALLY ask Himbot something! So cool!',
 	options: ['prompt']
@@ -43,7 +42,7 @@ export class UserCommand extends Command {
 				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
 		const chatCompletion = await openai.chat.completions.create({
-			model: 'gpt-4',
+			model: 'gpt-4-1106-preview',
 			messages: [
 				{
 					role: 'user',
