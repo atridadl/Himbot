@@ -8,8 +8,8 @@ const client = new SapphireClient({
 		status: 'online',
 		activities: [
 			{
-				name: 'BOAT PARADE! BOAT PARADE! BOAT PARADE!',
-				type: ActivityType.Listening
+				name: 'idk',
+				type: ActivityType.Custom
 			}
 		]
 	},
@@ -22,7 +22,7 @@ const client = new SapphireClient({
 	defaultCooldown: {
 		// 10s
 		delay: 10_000,
-		filteredCommands: ['disclosure', 'support', 'ping', 'wryna'],
+		filteredCommands: ['support', 'ping', 'wryna'],
 		limit: 2,
 		// Yes... I did hardcode myself.
 		filteredUsers: ['83679718401904640'],

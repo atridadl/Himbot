@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args, BucketScope, Command } from '@sapphire/framework';
-import { AttachmentBuilder, Message } from 'discord.js';
+import { AttachmentBuilder, Message, MessageFlags } from 'discord.js';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -64,21 +64,32 @@ export class UserCommand extends Command {
 			const content = `Prompt: ${prompt}:`;
 
 			if (interactionOrMessage instanceof Message) {
-				return askMessage.edit({ content, files: mp3Attachment });
+				return askMessage.edit({
+					content,
+					files: mp3Attachment,
+					flags: '8192'
+				});
 			}
 
 			return interactionOrMessage.editReply({
 				content,
-				files: mp3Attachment
+				files: mp3Attachment,
+				options: {
+					flags: MessageFlags.IsVoiceMessage.valueOf()
+				}
 			});
 		} catch (error) {
 			const content = "Sorry, I can't complete the prompt for: " + prompt + '\n' + error;
 
 			if (interactionOrMessage instanceof Message) {
-				return askMessage.edit({ content });
+				return askMessage.edit({
+					content
+				});
 			}
 
-			return interactionOrMessage.editReply({ content });
+			return interactionOrMessage.editReply({
+				content
+			});
 		}
 	}
 }
