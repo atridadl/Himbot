@@ -9,9 +9,9 @@ const openai = new OpenAI({
 
 // @ts-ignore
 @ApplyOptions<Command.Options>({
-	description: 'Pic... but better! Cooldown of 6 Minutes!',
+	description: 'Pic... but better! Cooldown of 10 Minutes!',
 	options: ['prompt'],
-	cooldownDelay: 600_000,
+	cooldownDelay: 1_000_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
 	cooldownFilteredUsers: ['83679718401904640'],
@@ -91,7 +91,7 @@ export class UserCommand extends Command {
 				});
 			}
 		} catch (error) {
-			const content = "Sorry, I can't complete the prompt for: " + prompt + '\n' + 'Error: ' + error;
+			const content = "Sorry, I can't complete the prompt for: " + prompt + '\n' + error;
 
 			if (interactionOrMessage instanceof Message) {
 				return askMessage.edit({ content });
