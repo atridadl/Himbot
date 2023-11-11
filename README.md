@@ -17,7 +17,6 @@ Commands and Listeners are all stored in named files within the src/commands and
 -   Create a Discord Bot with all gateway permissions enabled
 -   Generate a token for this discord bot and paste it in the .env for DISCORD_TOKEN
 -   Generate and provide an OpenAPI token and paste it in the .env for OPENAI_API_KEY
--   Generate and provide a StabilityAI token and paste it in the .env for STABILITY_API_KEY
 -   Run `pnpm dev` to run locally
 
 ## Adding the bot to a server
@@ -31,7 +30,7 @@ https://discord.com/oauth2/authorize?client_id=DISCORD_CLIENT_ID&scope=bot&permi
 
 ##### Description
 
-A command that returns the answer to your prompt for OpenAI's GPT 3.5 turbo model.
+A command that returns the answer to your prompt for OpenAI's GPT 4.0 turbo model.
 
 #### Usage
 
@@ -47,16 +46,6 @@ A command that returns a random picture of a dog.
 
 `/borf`
 
-### **credits**
-
-#### Description
-
-A command that returns number of Stable Diffusion credits that are available.
-
-#### Usage
-
-`/credits`
-
 ### **dad**
 
 #### Description
@@ -67,45 +56,25 @@ A command that returns a random dad joke.
 
 `/dad`
 
-### **disclosure**
-
-#### Description
-
-A command that a disclosure statement for data processing.
-
-#### Usage
-
-`/disclosure`
-
 ### **fancypic**
 
 #### Description
 
-A command that returns 1-2 AI generated images using the SDXL 0.9 model.
+A command that return an image using DALL.E with "hd" quality.
 
 #### Usage
 
-`/fancypic prompt:prompt_text amount:1`
-
-### **meow**
-
-#### Description
-
-A command that returns a random picture of a cat.
-
-#### Usage
-
-`/meow`
+`/fancypic prompt`
 
 ### **pic**
 
 #### Description
 
-A command that returns 1-4 AI generated images using the SDXL beta model.
+A command that return an image using DALL.E with "standard" quality.
 
 #### Usage
 
-`/pic prompt:prompt_text amount:1`
+`/pic prompt`
 
 ### **ping**
 
