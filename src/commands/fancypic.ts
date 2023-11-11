@@ -12,7 +12,7 @@ const openai = new OpenAI({
 	description: 'Pic... but better!',
 	options: ['prompt'],
 	// 10mins
-	cooldownDelay: 400_000,
+	cooldownDelay: 500_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
 	cooldownFilteredUsers: ['83679718401904640'],
@@ -52,7 +52,8 @@ export class UserCommand extends Command {
 				model: 'dall-e-3',
 				prompt,
 				n: 1,
-				size: '1024x1024'
+				size: '1024x1024',
+				quality: 'hd'
 			});
 
 			const imageUrl = response.data[0].url || '';
