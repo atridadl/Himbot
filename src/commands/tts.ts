@@ -11,7 +11,7 @@ const openai = new OpenAI({
 @ApplyOptions<Command.Options>({
 	description: 'Generate TTS every 5 minutes!',
 	options: ['prompt'],
-	cooldownDelay: 3_000_000,
+	cooldownDelay: 300_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
 	cooldownFilteredUsers: ['83679718401904640'],
