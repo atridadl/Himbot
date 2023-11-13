@@ -9,7 +9,7 @@ const openai = new OpenAI({
 
 // @ts-ignore
 @ApplyOptions<Command.Options>({
-	description: 'Generate TTS every 5 minutes!',
+	description: 'Generate TTS every 3 minutes!',
 	options: ['prompt'],
 	cooldownDelay: 300_000,
 	cooldownLimit: 1,

@@ -9,9 +9,9 @@ const openai = new OpenAI({
 
 // @ts-ignore
 @ApplyOptions<Command.Options>({
-	description: 'Generate a pic every 5 minutes!',
+	description: 'Generate a pic every 4 minutes!',
 	options: ['prompt'],
-	cooldownDelay: 500_000,
+	cooldownDelay: 400_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
 	cooldownFilteredUsers: ['83679718401904640'],
