@@ -106,7 +106,7 @@ A command that returns a Stripe link that can be used to fund credits for the AI
 
 `/support`
 
-### **wryna**
+### **hs**
 
 #### Description
 
@@ -114,4 +114,4 @@ A command that returns "my nickname in highschool" response given your prompt
 
 #### Usage
 
-`/wryna nickname:butts`
+`/hs nickname:butts`
