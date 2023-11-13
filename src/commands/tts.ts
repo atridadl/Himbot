@@ -45,9 +45,19 @@ export class UserCommand extends Command {
 				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
 		try {
+			enum voice {
+				alloy = 'alloy',
+				echo = 'echo',
+				fable = 'fable',
+				onyx = 'onyx',
+				nova = 'nova',
+				shimmer = 'shimmer'
+			}
+
+			const voices = [voice.alloy, voice.echo, voice.fable, voice.onyx, voice.nova, voice.shimmer];
 			const mp3 = await openai.audio.speech.create({
 				model: 'tts-1',
-				voice: 'shimmer',
+				voice: voices[Math.floor(Math.random() * voices.length)],
 				input: prompt
 			});
 			const mp3Buffer = Buffer.from(await mp3.arrayBuffer());
