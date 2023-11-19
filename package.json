@@ -10,23 +10,23 @@
 	"type": "commonjs",
 	"dependencies": {
 		"@sapphire/decorators": "^6.0.2",
-		"@sapphire/discord.js-utilities": "7.0.2",
-		"@sapphire/framework": "^4.7.2",
-		"@sapphire/plugin-logger": "^3.0.6",
+		"@sapphire/discord.js-utilities": "7.1.2",
+		"@sapphire/framework": "^4.8.2",
+		"@sapphire/plugin-logger": "^3.0.7",
 		"@sapphire/utilities": "^3.13.0",
 		"@skyra/env-utilities": "^1.2.1",
 		"colorette": "^2.0.20",
-		"discord.js": "^14.13.0",
-		"openai": "^4.17.3"
+		"discord.js": "^14.14.1",
+		"openai": "^4.19.0"
 	},
 	"devDependencies": {
 		"@flydotio/dockerfile": "^0.4.10",
-		"@sapphire/cli": "^1.6.1",
+		"@sapphire/cli": "^1.8.0",
 		"@sapphire/prettier-config": "^2.0.0",
 		"@sapphire/ts-config": "^5.0.0",
-		"@types/node": "^20.9.0",
+		"@types/node": "^20.9.2",
 		"@types/ws": "^8.5.9",
-		"prettier": "^3.0.3",
+		"prettier": "^3.1.0",
 		"tsc-watch": "^6.0.4",
 		"typescript": "^5.2.2"
 	},
