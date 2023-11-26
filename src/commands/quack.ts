@@ -28,7 +28,7 @@ export class UserCommand extends Command {
 
 	private async sendQuack(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction) {
 		const duckResponse = await fetch('https://random-d.uk/api/v2/quack');
-		const duckData = await duckResponse.json();
+		const duckData = (await duckResponse.json()) as { url: string };
 
 		interactionOrMessage instanceof Message
 			? await interactionOrMessage.channel.send({

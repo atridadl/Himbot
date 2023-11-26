@@ -28,11 +28,11 @@ export class UserCommand extends Command {
 
 	private async sendBorf(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction) {
 		const dogResponse = await fetch('https://dog.ceo/api/breeds/image/random');
-		const dogData = await dogResponse.json();
+		const dogData = (await dogResponse.json()) as { message: string; status: string };
 
 		interactionOrMessage instanceof Message
 			? await interactionOrMessage.channel.send({
-					content: dogData.status === 'success' ? dogData.message : 'Error: I had troubles fetching perfect puppies for you... :('
+					content: dogData?.status === 'success' ? dogData.message : 'Error: I had troubles fetching perfect puppies for you... :('
 			  })
 			: await interactionOrMessage.reply({
 					content: dogData.status === 'success' ? dogData.message : 'Error: I had troubles fetching perfect puppies for you... :(',

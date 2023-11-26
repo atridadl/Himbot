@@ -52,7 +52,7 @@ export class UserCommand extends Command {
 				prompt,
 				n: 1,
 				size: '1024x1024',
-				quality: 'hd'
+				quality: 'standard'
 			});
 
 			const imageUrl = response.data[0].url || '';

@@ -32,7 +32,7 @@ export class UserCommand extends Command {
 				Accept: 'application/json'
 			}
 		});
-		const jokeData = await jokeResponse.json();
+		const jokeData = (await jokeResponse.json()) as { status: number; joke: string };
 
 		interactionOrMessage instanceof Message
 			? await interactionOrMessage.channel.send({
