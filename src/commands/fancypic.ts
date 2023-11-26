@@ -11,7 +11,7 @@ const openai = new OpenAI({
 @ApplyOptions<Command.Options>({
 	description: 'Pic... but better! Cooldown of 8 Minutes!',
 	options: ['prompt'],
-	cooldownDelay: 800_000,
+	cooldownDelay: 1_000_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
 	cooldownFilteredUsers: ['83679718401904640'],
