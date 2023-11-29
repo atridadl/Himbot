@@ -17,7 +17,7 @@
 		"@skyra/env-utilities": "^1.2.1",
 		"colorette": "^2.0.20",
 		"discord.js": "^14.14.1",
-		"openai": "^4.20.0"
+		"openai": "^4.20.1"
 	},
 	"devDependencies": {
 		"@flydotio/dockerfile": "^0.4.11",
