@@ -1,15 +1,18 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args, BucketScope, Command } from '@sapphire/framework';
-import { AttachmentBuilder, Message } from 'discord.js';
+import { Message } from 'discord.js';
+import Replicate from 'replicate';
 
-// This is literally the worlds messiest TS code. Please don't judge me...
+const replicate = new Replicate({
+	auth: process.env.REPLICATE_API_TOKEN
+});
 
 // @ts-ignore
 @ApplyOptions<Command.Options>({
-	description: 'Make a picture... but high res!',
-	options: ['prompt', 'number of pictures'],
+	description: 'Generate an image using Stability AI! Cooldown 1 Minute to prevent spam!',
+	options: ['prompt'],
 	// 10mins
-	cooldownDelay: 100,
+	cooldownDelay: 100_000,
 	cooldownLimit: 1,
 	// Yes... I did hardcode myself.
 	cooldownFilteredUsers: ['83679718401904640'],
@@ -25,135 +28,39 @@ export class UserCommand extends Command {
 				.addStringOption((option) =>
 					option.setName('prompt').setDescription('The prompt you will use to generate an image!').setRequired(true)
 				)
-				.addStringOption((option) =>
-					option
-						.setName('amount')
-						.setDescription('The number of images you would like to generate. Maximum 2.')
-						.setChoices(
-							...[
-								{ name: '1', value: '1' },
-								{ name: '2', value: '2' }
-							]
-						)
-				)
 		);
 	}
 
 	// Message command
 	public async messageRun(message: Message, args: Args) {
-		const amount = Math.abs(Number(args.getOption('amount')));
-		return this.picHr(message, args.getOption('prompt') || 'Scold me for not passing any prompt in.', amount <= 2 ? amount : 1);
+		return this.picHr(message, args.getOption('prompt') || 'Scold me for not passing any prompt in.');
 	}
 
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		const amount = Number(interaction.options.getString('amount'));
-		return this.picHr(interaction, interaction.options.getString('prompt') || 'NOTHING', amount || 1);
+		return this.picHr(interaction, interaction.options.getString('prompt') || 'NOTHING');
 	}
 
-	private async picHr(
-		interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction,
-		prompt: string,
-		amount: number
-	) {
+	private async picHr(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction, prompt: string) {
 		const askMessage =
 			interactionOrMessage instanceof Message
 				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
 				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
-		const creditCountResponse = await fetch(`https://api.stability.ai/v1/user/balance`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${process.env.STABILITY_API_KEY}`
+		let result = (await replicate.run('stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b', {
+			input: {
+				prompt,
+				disable_safety_checker: true,
+				refine: 'expert_ensemble_refiner',
+				num_inference_steps: 50,
+				scheduler: 'K_EULER',
+				width: 1024,
+				height: 1024
 			}
-		});
+		})) as string[];
 
-		const balance = ((await creditCountResponse.json()) as { credits: number }).credits || 0;
-
-		if (balance > 5) {
-			const imageGenResponse = await fetch(`https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-					Authorization: `Bearer ${process.env.STABILITY_API_KEY}`
-				},
-				body: JSON.stringify({
-					text_prompts: [
-						{
-							text: prompt
-						}
-					],
-					cfg_scale: 6,
-					clip_guidance_preset: 'FAST_BLUE',
-					height: 1024,
-					width: 1024,
-					samples: amount,
-					steps: 32,
-					seed: Number(String(interactionOrMessage.member?.user.id).substring(0, 5)) || 0
-				})
-			});
-
-			interface GenerationResponse {
-				artifacts: Array<{
-					base64: string;
-					seed: number;
-					finishReason: string;
-				}>;
-			}
-
-			if (!imageGenResponse.ok) {
-				const content = `Sorry, I can't complete the prompt for: ${prompt}`;
-
-				if (interactionOrMessage instanceof Message) {
-					return askMessage.edit({ content });
-				}
-
-				return interactionOrMessage.editReply({
-					content: content
-				});
-			} else {
-				const responseJSON = (await imageGenResponse.json()) as GenerationResponse;
-				const imageAttachment: AttachmentBuilder[] = [];
-
-				for (let i = 0; i < responseJSON.artifacts.length; i++) {
-					imageAttachment.push(
-						new AttachmentBuilder(Buffer.from(responseJSON.artifacts[i].base64, 'base64'), {
-							name: 'response.jpg',
-							description: "Himbot's Response"
-						})
-					);
-				}
-
-				const newCreditCountResponse = await fetch(`https://api.stability.ai/v1/user/balance`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${process.env.STABILITY_API_KEY}`
-					}
-				});
-
-				const newBalance = ((await newCreditCountResponse.json()) as { credits: number }).credits || 0;
-
-				const content =
-					`Credits Used: ${balance - newBalance}\nPrompt: ${prompt}${
-						balance <= 300
-							? `\n\n⚠️I am now at ${balance} credits. If you'd like to help fund this command, please type "/support" for details!`
-							: ''
-					}` || 'ERROR!';
-
-				if (interactionOrMessage instanceof Message) {
-					return askMessage.edit({ content, files: imageAttachment });
-				}
-
-				return interactionOrMessage.editReply({
-					content,
-					files: imageAttachment
-				});
-			}
-		} else {
-			const content = `Oops! We're out of credits for this. If you'd like to help fund this command, please type "/support" for details!`;
+		if (result.length <= 0) {
+			const content = `Sorry, I can't complete the prompt for: ${prompt}`;
 
 			if (interactionOrMessage instanceof Message) {
 				return askMessage.edit({ content });
@@ -161,6 +68,16 @@ export class UserCommand extends Command {
 
 			return interactionOrMessage.editReply({
 				content: content
+			});
+		} else {
+			const content = `Prompt: ${prompt}\n URL: ${result[0]}`;
+
+			if (interactionOrMessage instanceof Message) {
+				return askMessage.edit({ content });
+			}
+
+			return interactionOrMessage.editReply({
+				content
 			});
 		}
 	}
