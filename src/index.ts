@@ -1,4 +1,14 @@
 import './lib/setup';
+import './listeners/ready';
+import './commands/ask';
+import './commands/borf';
+import './commands/hdpic';
+import './commands/hdtts';
+import './commands/hs';
+import './commands/pic';
+import './commands/title';
+import './commands/tts';
+import './listeners/commands/chatInputCommands/chatInputCommandSuccess';
 import { LogLevel, SapphireClient, BucketScope } from '@sapphire/framework';
 import { ActivityType, GatewayIntentBits } from 'discord.js';
 
@@ -18,7 +28,6 @@ const client = new SapphireClient({
 		level: LogLevel.Debug
 	},
 	intents: [GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMessages, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent],
-	loadMessageCommandListeners: true,
 	defaultCooldown: {
 		// 10s
 		delay: 10_000,
@@ -27,7 +36,8 @@ const client = new SapphireClient({
 		// Yes... I did hardcode myself.
 		filteredUsers: ['83679718401904640'],
 		scope: BucketScope.User
-	}
+	},
+	baseUserDirectory: null
 });
 
 const main = async () => {

@@ -1,23 +1,24 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { Args, BucketScope, Command } from '@sapphire/framework';
-import { AttachmentBuilder, Message, MessageFlags } from 'discord.js';
+import { BucketScope, Command, container } from '@sapphire/framework';
+import { AttachmentBuilder, MessageFlags } from 'discord.js';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY
 });
 
-// @ts-ignore
-@ApplyOptions<Command.Options>({
-	description: 'Generate TTS every minute!',
-	options: ['prompt'],
-	cooldownDelay: 100_000,
-	cooldownLimit: 1,
-	// Yes... I did hardcode myself.
-	cooldownFilteredUsers: ['83679718401904640'],
-	cooldownScope: BucketScope.User
-})
-export class UserCommand extends Command {
+export class TTSCommand extends Command {
+	public constructor(context: Command.LoaderContext) {
+		super(context, {
+			description: 'Generate TTS every minute!',
+			options: ['prompt'],
+			cooldownDelay: 100_000,
+			cooldownLimit: 1,
+			// Yes... I did hardcode myself.
+			cooldownFilteredUsers: ['83679718401904640'],
+			cooldownScope: BucketScope.User
+		});
+	}
+
 	// Register Chat Input and Context Menu command
 	public override registerApplicationCommands(registry: Command.Registry) {
 		registry.registerChatInputCommand((builder) =>
@@ -28,21 +29,11 @@ export class UserCommand extends Command {
 		);
 	}
 
-	// Message command
-	public async messageRun(message: Message, args: Args) {
-		return this.tts(message, args.getOption('prompt') || 'NOTHING');
-	}
-
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.tts(interaction, interaction.options.getString('prompt') || 'NOTHING');
-	}
+		const prompt = interaction.options.getString('prompt') || 'NOTHING';
 
-	private async tts(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction, prompt: string) {
-		const askMessage =
-			interactionOrMessage instanceof Message
-				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
-				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
+		await interaction.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
 		try {
 			enum voice {
@@ -73,15 +64,7 @@ export class UserCommand extends Command {
 
 			const content = `Prompt: ${prompt}:`;
 
-			if (interactionOrMessage instanceof Message) {
-				return askMessage.edit({
-					content,
-					files: mp3Attachment,
-					flags: '8192'
-				});
-			}
-
-			return interactionOrMessage.editReply({
+			return interaction.editReply({
 				content,
 				files: mp3Attachment,
 				options: {
@@ -91,15 +74,15 @@ export class UserCommand extends Command {
 		} catch (error) {
 			const content = "Sorry, I can't complete the prompt for: " + prompt + '\n' + error;
 
-			if (interactionOrMessage instanceof Message) {
-				return askMessage.edit({
-					content
-				});
-			}
-
-			return interactionOrMessage.editReply({
+			return interaction.editReply({
 				content
 			});
 		}
 	}
 }
+
+void container.stores.loadPiece({
+	store: 'commands',
+	name: 'tts',
+	piece: TTSCommand
+});

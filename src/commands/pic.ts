@@ -1,24 +1,24 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { Args, BucketScope, Command } from '@sapphire/framework';
-import { AttachmentBuilder, Message } from 'discord.js';
+import { BucketScope, Command, container } from '@sapphire/framework';
+import { AttachmentBuilder } from 'discord.js';
 import Replicate from 'replicate';
 
 const replicate = new Replicate({
 	auth: process.env.REPLICATE_API_TOKEN
 });
 
-// @ts-ignore
-@ApplyOptions<Command.Options>({
-	description: 'Generate an image using Stability AI! Cooldown 1 Minute to prevent spam!',
-	options: ['prompt'],
-	// 10mins
-	cooldownDelay: 100_000,
-	cooldownLimit: 1,
-	// Yes... I did hardcode myself.
-	cooldownFilteredUsers: ['83679718401904640'],
-	cooldownScope: BucketScope.User
-})
-export class UserCommand extends Command {
+export class PicCommand extends Command {
+	public constructor(context: Command.LoaderContext) {
+		super(context, {
+			description: 'Generate an image using Stability AI! Cooldown 1 Minute to prevent spam!',
+			options: ['prompt'],
+			cooldownDelay: 100_000,
+			cooldownLimit: 1,
+			// Yes... I did hardcode myself.
+			cooldownFilteredUsers: ['83679718401904640'],
+			cooldownScope: BucketScope.User
+		});
+	}
+
 	// Register Chat Input and Context Menu command
 	public override registerApplicationCommands(registry: Command.Registry) {
 		registry.registerChatInputCommand((builder) =>
@@ -31,21 +31,11 @@ export class UserCommand extends Command {
 		);
 	}
 
-	// Message command
-	public async messageRun(message: Message, args: Args) {
-		return this.picHr(message, args.getOption('prompt') || 'Scold me for not passing any prompt in.');
-	}
-
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.picHr(interaction, interaction.options.getString('prompt') || 'NOTHING');
-	}
+		const prompt = interaction.options.getString('prompt') || 'NOTHING';
 
-	private async picHr(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction, prompt: string) {
-		const askMessage =
-			interactionOrMessage instanceof Message
-				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
-				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
+		await interaction.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
 		let result = (await replicate.run('stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b', {
 			input: {
@@ -66,11 +56,7 @@ export class UserCommand extends Command {
 		if (result.length <= 0) {
 			const content = `Sorry, I can't complete the prompt for: ${prompt}`;
 
-			if (interactionOrMessage instanceof Message) {
-				return askMessage.edit({ content });
-			}
-
-			return interactionOrMessage.editReply({
+			return interaction.editReply({
 				content: content
 			});
 		} else {
@@ -89,14 +75,16 @@ export class UserCommand extends Command {
 
 			const content = `Prompt: ${prompt}`;
 
-			if (interactionOrMessage instanceof Message) {
-				return askMessage.edit({ content, files: imageAttachment });
-			}
-
-			return interactionOrMessage.editReply({
+			return interaction.editReply({
 				content,
 				files: imageAttachment
 			});
 		}
 	}
 }
+
+void container.stores.loadPiece({
+	store: 'commands',
+	name: 'pic',
+	piece: PicCommand
+});

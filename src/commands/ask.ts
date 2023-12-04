@@ -1,19 +1,19 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { Args, Command } from '@sapphire/framework';
-import { AttachmentBuilder, Message, blockQuote, codeBlock } from 'discord.js';
+import { Command, container } from '@sapphire/framework';
+import { AttachmentBuilder, blockQuote, codeBlock } from 'discord.js';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY
 });
 
-// @ts-ignore
-@ApplyOptions<Command.Options>({
-	description: 'You can ACTUALLY ask Himbot something! So cool!',
-	options: ['prompt']
-})
-export class UserCommand extends Command {
-	// Register Chat Input and Context Menu command
+export class AskCommand extends Command {
+	public constructor(context: Command.LoaderContext) {
+		super(context, {
+			description: 'You can ACTUALLY ask Himbot something! So cool!',
+			options: ['prompt']
+		});
+	}
+
 	public override registerApplicationCommands(registry: Command.Registry) {
 		registry.registerChatInputCommand((builder) =>
 			builder
@@ -25,21 +25,10 @@ export class UserCommand extends Command {
 		);
 	}
 
-	// Message command
-	public async messageRun(message: Message, args: Args) {
-		return this.ask(message, args.getOption('prompt') || message.content.split('!ask ')[1]);
-	}
-
-	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.ask(interaction, interaction.options.getString('prompt') || 'NOTHING');
-	}
+		const prompt = interaction.options.getString('prompt');
 
-	private async ask(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction, prompt: string) {
-		const askMessage =
-			interactionOrMessage instanceof Message
-				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
-				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
+		await interaction.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
 		const chatCompletion = await openai.chat.completions.create({
 			model: 'gpt-4-1106-preview',
@@ -64,17 +53,7 @@ export class UserCommand extends Command {
 			);
 		}
 
-		if (interactionOrMessage instanceof Message) {
-			return askMessage.edit({
-				content:
-					content.length < 2000
-						? content
-						: `Discord only allows messages with 2000 characters or less. Please see your response in the attached file!`,
-				files: messageAttachment
-			});
-		}
-
-		return interactionOrMessage.editReply({
+		return interaction.editReply({
 			content:
 				content.length < 2000
 					? content
@@ -83,3 +62,9 @@ export class UserCommand extends Command {
 		});
 	}
 }
+
+void container.stores.loadPiece({
+	store: 'commands',
+	name: 'ask',
+	piece: AskCommand
+});

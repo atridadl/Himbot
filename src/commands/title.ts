@@ -1,13 +1,13 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { Args, Command } from '@sapphire/framework';
-import { Message } from 'discord.js';
+import { Command, container } from '@sapphire/framework';
 
-// @ts-ignore
-@ApplyOptions<Command.Options>({
-	description: 'This command is the title of your sextape.',
-	options: ['title']
-})
-export class UserCommand extends Command {
+export class TitleCommand extends Command {
+	public constructor(context: Command.LoaderContext) {
+		super(context, {
+			description: 'This command is the title of your sextape.',
+			options: ['title']
+		});
+	}
+
 	// Register Chat Input and Context Menu command
 	public override registerApplicationCommands(registry: Command.Registry) {
 		registry.registerChatInputCommand((builder) =>
@@ -18,27 +18,19 @@ export class UserCommand extends Command {
 		);
 	}
 
-	// Message command
-	public async messageRun(message: Message, args: Args) {
-		return this.titleHandler(message, args.getOption('title') || message.content.split('!title ')[1]);
-	}
-
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.titleHandler(interaction, interaction.options.getString('title') || 'NOTHING');
-	}
+		const title = interaction.options.getString('title') || 'NOTHING';
 
-	private async titleHandler(
-		interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction,
-		title: string
-	) {
-		interactionOrMessage instanceof Message
-			? await interactionOrMessage.channel.send({
-					content: `${title}: Title of ${interactionOrMessage.author.username}'s sex tape!`
-			  })
-			: await interactionOrMessage.reply({
-					content: `${title}: Title of ${interactionOrMessage.user.username}'s sex tape!`,
-					fetchReply: true
-			  });
+		await interaction.reply({
+			content: `${title}: Title of ${interaction.user.username}'s sex tape!`,
+			fetchReply: true
+		});
 	}
 }
+
+void container.stores.loadPiece({
+	store: 'commands',
+	name: 'title',
+	piece: TitleCommand
+});

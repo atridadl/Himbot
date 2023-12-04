@@ -1,21 +1,11 @@
-import {
-	container,
-	type ChatInputCommandSuccessPayload,
-	type Command,
-	type ContextMenuCommandSuccessPayload,
-	type MessageCommandSuccessPayload
-} from '@sapphire/framework';
+import { container, type ChatInputCommandSuccessPayload, type Command, type ContextMenuCommandSuccessPayload } from '@sapphire/framework';
 import { cyan } from 'colorette';
 import type { APIUser, Guild, User } from 'discord.js';
 
-export function logSuccessCommand(payload: ContextMenuCommandSuccessPayload | ChatInputCommandSuccessPayload | MessageCommandSuccessPayload): void {
+export function logSuccessCommand(payload: ContextMenuCommandSuccessPayload | ChatInputCommandSuccessPayload): void {
 	let successLoggerData: ReturnType<typeof getSuccessLoggerData>;
 
-	if ('interaction' in payload) {
-		successLoggerData = getSuccessLoggerData(payload.interaction.guild, payload.interaction.user, payload.command);
-	} else {
-		successLoggerData = getSuccessLoggerData(payload.message.guild, payload.message.author, payload.command);
-	}
+	successLoggerData = getSuccessLoggerData(payload.interaction.guild, payload.interaction.user, payload.command);
 
 	container.logger.debug(`${successLoggerData.shard} - ${successLoggerData.commandName} ${successLoggerData.author} ${successLoggerData.sentAt}`);
 }

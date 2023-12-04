@@ -1,23 +1,23 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { Args, BucketScope, Command } from '@sapphire/framework';
-import { AttachmentBuilder, Message } from 'discord.js';
+import { BucketScope, Command, container } from '@sapphire/framework';
+import { AttachmentBuilder } from 'discord.js';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY
 });
 
-// @ts-ignore
-@ApplyOptions<Command.Options>({
-	description: 'Generate an image using OpenAI! Cooldown of 10 Minutes due to cost!',
-	options: ['prompt'],
-	cooldownDelay: 480_000,
-	cooldownLimit: 1,
-	// Yes... I did hardcode myself.
-	cooldownFilteredUsers: ['83679718401904640'],
-	cooldownScope: BucketScope.User
-})
-export class UserCommand extends Command {
+export class HDPicCommand extends Command {
+	public constructor(context: Command.LoaderContext) {
+		super(context, {
+			description: 'Generate an image using OpenAI! Cooldown of 10 Minutes due to cost!',
+			options: ['prompt'],
+			cooldownDelay: 480_000,
+			cooldownLimit: 1,
+			cooldownFilteredUsers: ['83679718401904640'],
+			cooldownScope: BucketScope.User
+		});
+	}
+
 	// Register Chat Input and Context Menu command
 	public override registerApplicationCommands(registry: Command.Registry) {
 		registry.registerChatInputCommand((builder) =>
@@ -30,21 +30,11 @@ export class UserCommand extends Command {
 		);
 	}
 
-	// Message command
-	public async messageRun(message: Message, args: Args) {
-		return this.pic(message, args.getOption('prompt') || 'NOTHING');
-	}
-
 	// Chat Input (slash) command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return this.pic(interaction, interaction.options.getString('prompt') || 'NOTHING');
-	}
+		const prompt = interaction.options.getString('prompt') || '';
 
-	private async pic(interactionOrMessage: Message | Command.ChatInputCommandInteraction | Command.ContextMenuCommandInteraction, prompt: string) {
-		const askMessage =
-			interactionOrMessage instanceof Message
-				? await interactionOrMessage.channel.send({ content: '🤔 Thinking... 🤔' })
-				: await interactionOrMessage.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
+		await interaction.reply({ content: '🤔 Thinking... 🤔', fetchReply: true });
 
 		try {
 			const response = await openai.images.generate({
@@ -70,22 +60,20 @@ export class UserCommand extends Command {
 
 			const content = `Prompt: ${prompt}:`;
 
-			if (interactionOrMessage instanceof Message) {
-				return askMessage.edit({ content, files: imageAttachment });
-			}
-
-			return interactionOrMessage.editReply({
+			return interaction.editReply({
 				content,
 				files: imageAttachment
 			});
 		} catch (error) {
 			const content = "Sorry, I can't complete the prompt for: " + prompt + '\n' + error;
 
-			if (interactionOrMessage instanceof Message) {
-				return askMessage.edit({ content });
-			}
-
-			return interactionOrMessage.editReply({ content });
+			return interaction.editReply({ content });
 		}
 	}
 }
+
+void container.stores.loadPiece({
+	store: 'commands',
+	name: 'hdpic',
+	piece: HDPicCommand
+});
