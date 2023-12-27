@@ -11,6 +11,12 @@ import (
 var redis_host = os.Getenv("REDIS_HOST")
 var redis_password = os.Getenv("REDIS_PASSWORD")
 
+var rdb = redis.NewClient(&redis.Options{
+	Addr:     redis_host,
+	Password: redis_password,
+	DB:       0,
+})
+
 func SetCache(key string, value string, ttlMinutes int) bool {
 	println("Setting the Cache")
 	rdb := redis.NewClient(&redis.Options{
@@ -32,11 +38,7 @@ func SetCache(key string, value string, ttlMinutes int) bool {
 
 func GetCache(key string) string {
 	println("Fetching From Cache")
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     redis_host,
-		Password: redis_password,
-		DB:       0,
-	})
+
 	if rdb == nil {
 		panic("Failed to create Redis client")
 	}
