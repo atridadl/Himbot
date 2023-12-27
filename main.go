@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"himbot/lib"
 	"io"
 	"log"
 	"net/http"
@@ -131,13 +130,13 @@ func (h *handler) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.I
 
 func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	cachedVal := lib.GetCache(data.Event.User.ID.String() + ":" + "ask")
-	if cachedVal != "nil" {
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Please wait for the cooldown!"),
-		}
-	}
-	lib.SetCache(data.Event.User.ID.String()+":"+"ask", data.Event.User.ID.String()+":"+"ask", 1)
+	// cachedVal := lib.GetCache(data.Event.User.ID.String() + ":" + "ask")
+	// if cachedVal != "nil" {
+	// 	return &api.InteractionResponseData{
+	// 		Content: option.NewNullableString("Please wait for the cooldown!"),
+	// 	}
+	// }
+	// lib.SetCache(data.Event.User.ID.String()+":"+"ask", data.Event.User.ID.String()+":"+"ask", 1)
 
 	// Command Logic
 	var options struct {
@@ -179,13 +178,13 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	cachedVal := lib.GetCache(data.Event.User.ID.String() + ":" + "pic")
-	if cachedVal != "nil" {
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Please wait for the cooldown!"),
-		}
-	}
-	lib.SetCache(data.Event.User.ID.String()+":"+"pic", data.Event.User.ID.String()+":"+"pic", 1)
+	// cachedVal := lib.GetCache(data.Event.User.ID.String() + ":" + "pic")
+	// if cachedVal != "nil" {
+	// 	return &api.InteractionResponseData{
+	// 		Content: option.NewNullableString("Please wait for the cooldown!"),
+	// 	}
+	// }
+	// lib.SetCache(data.Event.User.ID.String()+":"+"pic", data.Event.User.ID.String()+":"+"pic", 1)
 
 	// Command Logic
 	var options struct {
@@ -257,13 +256,13 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	cachedVal := lib.GetCache(data.Event.User.ID.String() + ":" + "hdpic")
-	if cachedVal != "nil" {
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Please wait for the cooldown!"),
-		}
-	}
-	lib.SetCache(data.Event.User.ID.String()+":"+"hdpic", data.Event.User.ID.String()+":"+"hdpic", 10)
+	// cachedVal := lib.GetCache(data.Event.User.ID.String() + ":" + "hdpic")
+	// if cachedVal != "nil" {
+	// 	return &api.InteractionResponseData{
+	// 		Content: option.NewNullableString("Please wait for the cooldown!"),
+	// 	}
+	// }
+	// lib.SetCache(data.Event.User.ID.String()+":"+"hdpic", data.Event.User.ID.String()+":"+"hdpic", 10)
 
 	// Command Logic
 	var options struct {
