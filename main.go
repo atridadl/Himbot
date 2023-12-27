@@ -228,7 +228,8 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 	}
 
 	return &api.InteractionResponseData{
-		Files: []sendpart.File{file},
+		Content: option.NewNullableString("Prompt: " + options.Prompt),
+		Files:   []sendpart.File{file},
 	}
 }
 
@@ -276,7 +277,8 @@ func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.
 	}
 
 	return &api.InteractionResponseData{
-		Files: []sendpart.File{file},
+		Content: option.NewNullableString("Prompt: " + options.Prompt),
+		Files:   []sendpart.File{file},
 	}
 }
 
