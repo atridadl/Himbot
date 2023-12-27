@@ -223,7 +223,7 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 	imageFile := bytes.NewBuffer(imageBytes)
 
 	file := sendpart.File{
-		Name:   "image.png",
+		Name:   "himbot_response.png",
 		Reader: imageFile,
 	}
 
@@ -272,7 +272,7 @@ func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.
 	imageFile := bytes.NewBuffer(imageBytes)
 
 	file := sendpart.File{
-		Name:   "image.png",
+		Name:   "himbot_response.png",
 		Reader: imageFile,
 	}
 
