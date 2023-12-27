@@ -8,9 +8,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+var redis_host = os.Getenv("REDIS_HOST")
+var redis_password = os.Getenv("REDIS_PASSWORD")
+
 func SetCache(key string, value string, ttlMinutes int) bool {
-	var redis_host = os.Getenv("REDIS_HOST")
-	var redis_password = os.Getenv("REDIS_PASSWORD")
+	println("Setting the Cache")
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     redis_host,
 		Password: redis_password,
@@ -19,8 +21,6 @@ func SetCache(key string, value string, ttlMinutes int) bool {
 	if rdb == nil {
 		panic("Failed to create Redis client")
 	}
-
-	println("Created Client in Set")
 
 	err := rdb.Set(context.Background(), key, value, time.Minute*time.Duration(ttlMinutes)).Err()
 	if err != nil {
@@ -31,10 +31,7 @@ func SetCache(key string, value string, ttlMinutes int) bool {
 }
 
 func GetCache(key string) string {
-	var redis_host = os.Getenv("REDIS_HOST")
-	var redis_password = os.Getenv("REDIS_PASSWORD")
-	println("Entered Get")
-
+	println("Fetching From Cache")
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     redis_host,
 		Password: redis_password,
@@ -46,9 +43,11 @@ func GetCache(key string) string {
 
 	val, err := rdb.Get(context.Background(), key).Result()
 	if err != nil {
+		println("Cache Miss")
 		return "nil"
 	}
-	println("Called Get")
+
+	println("Cache Hit")
 
 	return val
 }
