@@ -1,13 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"log"
-	"math/rand"
+	"net/http"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
@@ -15,7 +16,9 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/joho/godotenv"
+	"github.com/replicate/replicate-go"
 	openai "github.com/sashabaranov/go-openai"
 )
 
@@ -25,27 +28,45 @@ var commands = []api.CreateCommandData{
 		Description: "ping pong!",
 	},
 	{
-		Name:        "echo",
-		Description: "echo back the argument",
+		Name:        "ask",
+		Description: "Ask Himbot!",
 		Options: []discord.CommandOption{
 			&discord.StringOption{
-				OptionName:  "argument",
-				Description: "what's echoed back",
+				OptionName:  "prompt",
+				Description: "The prompt to send to Himbot.",
 				Required:    true,
 			},
 		},
 	},
 	{
-		Name:        "thonk",
-		Description: "biiiig thonk",
-	},
-	{
-		Name:        "ask",
-		Description: "Ask Himbot!",
+		Name:        "pic",
+		Description: "Generate an image using Stable Diffusion!",
 		Options: []discord.CommandOption{
 			&discord.StringOption{
-				OptionName:  "argument",
-				Description: "the prompt",
+				OptionName:  "prompt",
+				Description: "The prompt for the image generation.",
+				Required:    true,
+			},
+		},
+	},
+	{
+		Name:        "hdpic",
+		Description: "Generate an image using DALL·E 3!",
+		Options: []discord.CommandOption{
+			&discord.StringOption{
+				OptionName:  "prompt",
+				Description: "The prompt for the image generation.",
+				Required:    true,
+			},
+		},
+	},
+	{
+		Name:        "hs",
+		Description: "This command was your nickname in highschool!",
+		Options: []discord.CommandOption{
+			&discord.StringOption{
+				OptionName:  "nickname",
+				Description: "Your nickname in highschool.",
 				Required:    true,
 			},
 		},
@@ -92,37 +113,23 @@ func newHandler(s *state.State) *handler {
 	// Automatically defer handles if they're slow.
 	h.Use(cmdroute.Deferrable(s, cmdroute.DeferOpts{}))
 	h.AddFunc("ping", h.cmdPing)
-	h.AddFunc("echo", h.cmdEcho)
-	h.AddFunc("thonk", h.cmdThonk)
 	h.AddFunc("ask", h.cmdAsk)
+	h.AddFunc("pic", h.cmdPic)
+	h.AddFunc("hdpic", h.cmdHDPic)
+	h.AddFunc("hs", h.cmdHS)
 
 	return h
 }
 
-func (h *handler) cmdPing(ctx context.Context, cmd cmdroute.CommandData) *api.InteractionResponseData {
+func (h *handler) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	return &api.InteractionResponseData{
 		Content: option.NewNullableString("Pong!"),
 	}
 }
 
-func (h *handler) cmdEcho(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	var options struct {
-		Arg string `discord:"argument"`
-	}
-
-	if err := data.Options.Unmarshal(&options); err != nil {
-		return errorResponse(err)
-	}
-
-	return &api.InteractionResponseData{
-		Content:         option.NewNullableString(options.Arg),
-		AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
-	}
-}
-
 func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	var options struct {
-		Arg string `discord:"argument"`
+		Arg string `discord:"prompt"`
 	}
 
 	if err := data.Options.Unmarshal(&options); err != nil {
@@ -158,10 +165,132 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 	}
 }
 
-func (h *handler) cmdThonk(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	time.Sleep(time.Duration(3+rand.Intn(5)) * time.Second)
+func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	var options struct {
+		Prompt string `discord:"prompt"`
+	}
+
+	if err := data.Options.Unmarshal(&options); err != nil {
+		return errorResponse(err)
+	}
+
+	client, clientError := replicate.NewClient(replicate.WithTokenFromEnv())
+	if clientError != nil {
+		return errorResponse(clientError)
+	}
+	if err := data.Options.Unmarshal(&options); err != nil {
+		return errorResponse(err)
+	}
+
+	input := replicate.PredictionInput{
+		"prompt": options.Prompt,
+	}
+	webhook := replicate.Webhook{
+		URL:    "https://example.com/webhook",
+		Events: []replicate.WebhookEventType{"start", "completed"},
+	}
+
+	prediction, predictionError := client.Run(context.Background(), "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", input, &webhook)
+
+	if predictionError != nil {
+		return errorResponse(predictionError)
+	}
+
+	test, ok := prediction.([]interface{})
+
+	if !ok {
+		fmt.Println("prediction is not []interface{}")
+	}
+
+	imgUrl, ok := test[0].(string)
+
+	if !ok {
+		fmt.Println("prediction.Output[0] is not a string")
+	}
+
+	imageRes, imageGetErr := http.Get(imgUrl)
+	if imageGetErr != nil {
+		log.Fatalln(imageGetErr)
+	}
+
+	defer imageRes.Body.Close()
+
+	imageBytes, imgReadErr := io.ReadAll(imageRes.Body)
+	if imgReadErr != nil {
+		log.Fatalln(imgReadErr)
+	}
+
+	imageFile := bytes.NewBuffer(imageBytes)
+
+	file := sendpart.File{
+		Name:   "image.png",
+		Reader: imageFile,
+	}
+
 	return &api.InteractionResponseData{
-		Content: option.NewNullableString("https://tenor.com/view/thonk-thinking-sun-thonk-sun-thinking-sun-gif-14999983"),
+		Files: []sendpart.File{file},
+	}
+}
+
+func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	var options struct {
+		Prompt string `discord:"prompt"`
+	}
+
+	if err := data.Options.Unmarshal(&options); err != nil {
+		return errorResponse(err)
+	}
+
+	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
+
+	// Send the generation request to DALL·E 3
+	resp, err := client.CreateImage(context.Background(), openai.ImageRequest{
+		Prompt: options.Prompt,
+		Model:  "dall-e-3",
+		Size:   "1024x1024",
+	})
+	if err != nil {
+		log.Printf("Image creation error: %v\n", err)
+		return errorResponse(fmt.Errorf("failed to generate image"))
+	}
+
+	imageRes, err := http.Get(resp.Data[0].URL)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer imageRes.Body.Close()
+
+	imageBytes, err := io.ReadAll(imageRes.Body)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	imageFile := bytes.NewBuffer(imageBytes)
+
+	file := sendpart.File{
+		Name:   "image.png",
+		Reader: imageFile,
+	}
+
+	return &api.InteractionResponseData{
+		Files: []sendpart.File{file},
+	}
+}
+
+func (h *handler) cmdHS(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	var options struct {
+		Arg string `discord:"nickname"`
+	}
+
+	if err := data.Options.Unmarshal(&options); err != nil {
+		return errorResponse(err)
+	}
+
+	return &api.InteractionResponseData{
+		Content: option.NewNullableString(options.Arg + " was " + data.Event.User.DisplayName + "'s nickname in highschool!"),
 	}
 }
 
