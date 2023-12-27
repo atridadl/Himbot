@@ -1,15 +1,10 @@
 # HimBot
 
-A discord bot written in Typescript.
+A discord bot written in Go.
 
 ## It's dangerous to go alone! Take this!
 
--   Install Nodejs 18 or later [here](https://nodejs.org/en/download) (required)
--   The pnpm package manager `npm i -g pnpm` (recommended)
-
-## Structure
-
-Commands and Listeners are all stored in named files within the src/commands and src/listeners directories respectively.
+-   Install Go 1.21.5 or higher (required)
 
 ## Running Locally
 
@@ -17,7 +12,8 @@ Commands and Listeners are all stored in named files within the src/commands and
 -   Create a Discord Bot with all gateway permissions enabled
 -   Generate a token for this discord bot and paste it in the .env for DISCORD_TOKEN
 -   Generate and provide an OpenAPI token and paste it in the .env for OPENAI_API_KEY
--   Run `pnpm dev` to run locally
+-   Generate and provide an Replicate token and paste it in the .env for REPLICATE_API_TOKEN
+-   Run `go run main.go` to run locally
 
 ## Adding the bot to a server
 
