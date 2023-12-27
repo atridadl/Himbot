@@ -19,6 +19,8 @@ func SetCache(key string, value string, ttlMinutes int) bool {
 		DB:       0,
 	})
 
+	defer redis.Client.Close(*rdb)
+
 	err := rdb.Set(ctx, key, value, time.Minute*time.Duration(ttlMinutes)).Err()
 
 	return err != nil
@@ -30,6 +32,8 @@ func GetCache(key string) string {
 		Password: redis_password,
 		DB:       0,
 	})
+
+	defer redis.Client.Close(*rdb)
 
 	val, err := rdb.Get(ctx, key).Result()
 	if err != nil {
