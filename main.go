@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"himbot/lib"
 	"io"
@@ -135,9 +136,7 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 	cachedVal := lib.GetCache(user.ID().String() + ":" + "ask")
 	if cachedVal != "nil" {
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Please wait for the cooldown!"),
-		}
+		return errorResponse(errors.New("please wait for the cooldown"))
 	}
 	lib.SetCache(user.ID().String()+":"+"ask", user.ID().String()+":"+"ask", 1)
 
@@ -185,9 +184,8 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 
 	cachedVal := lib.GetCache(user.ID().String() + ":" + "pic")
 	if cachedVal != "nil" {
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Please wait for the cooldown!"),
-		}
+		return errorResponse(errors.New("please wait for the cooldown"))
+
 	}
 	lib.SetCache(user.ID().String()+":"+"pic", user.ID().String()+":"+"pic", 1)
 
@@ -236,14 +234,14 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 
 	imageRes, imageGetErr := http.Get(imgUrl)
 	if imageGetErr != nil {
-		log.Fatalln(imageGetErr)
+		return errorResponse(imageGetErr)
 	}
 
 	defer imageRes.Body.Close()
 
 	imageBytes, imgReadErr := io.ReadAll(imageRes.Body)
 	if imgReadErr != nil {
-		log.Fatalln(imgReadErr)
+		return errorResponse(imgReadErr)
 	}
 
 	imageFile := bytes.NewBuffer(imageBytes)
@@ -265,9 +263,7 @@ func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.
 
 	cachedVal := lib.GetCache(user.ID().String() + ":" + "hdpic")
 	if cachedVal != "nil" {
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Please wait for the cooldown!"),
-		}
+		return errorResponse(errors.New("please wait for the cooldown"))
 	}
 	lib.SetCache(user.ID().String()+":"+"hdpic", user.ID().String()+":"+"hdpic", 10)
 
@@ -296,7 +292,7 @@ func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.
 	imageRes, err := http.Get(resp.Data[0].URL)
 
 	if err != nil {
-		log.Fatalln(err)
+		return errorResponse(err)
 	}
 
 	defer imageRes.Body.Close()
@@ -304,7 +300,7 @@ func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.
 	imageBytes, err := io.ReadAll(imageRes.Body)
 
 	if err != nil {
-		log.Fatalln(err)
+		return errorResponse(err)
 	}
 
 	imageFile := bytes.NewBuffer(imageBytes)
