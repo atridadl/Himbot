@@ -354,9 +354,20 @@ func (h *handler) cmdHS(ctx context.Context, data cmdroute.CommandData) *api.Int
 	if err := data.Options.Unmarshal(&options); err != nil {
 		return errorResponse(err)
 	}
+	
+	member := data.Event.Member
+	user := data.Event.User
+
+	var nameToSend string
+
+	if member != nil {
+		nameToSend = member.User.DisplayName
+	} else {
+		nameToSend = user.DisplayName
+	}
 
 	return &api.InteractionResponseData{
-		Content: option.NewNullableString(options.Arg + " was " + data.Event.User.DisplayName + "'s nickname in highschool!"),
+		Content: option.NewNullableString(options.Arg + " was " + nameToSend + "'s nickname in highschool!"),
 	}
 }
 
