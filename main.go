@@ -131,24 +131,15 @@ func (h *handler) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.I
 
 func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	member := data.Event.Member
-	user := data.Event.User
+	user := lib.GetUserObject(*data.Event)
 
-	var idToSend string
-
-	if member != nil {
-		idToSend = member.User.ID.String()
-	} else {
-		idToSend = user.ID.String()
-	}
-
-	cachedVal := lib.GetCache(idToSend + ":" + "ask")
+	cachedVal := lib.GetCache(user.ID().String() + ":" + "ask")
 	if cachedVal != "nil" {
 		return &api.InteractionResponseData{
 			Content: option.NewNullableString("Please wait for the cooldown!"),
 		}
 	}
-	lib.SetCache(idToSend+":"+"ask", idToSend+":"+"ask", 1)
+	lib.SetCache(user.ID().String()+":"+"ask", user.ID().String()+":"+"ask", 1)
 
 	// Command Logic
 	var options struct {
@@ -190,24 +181,15 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	member := data.Event.Member
-	user := data.Event.User
+	user := lib.GetUserObject(*data.Event)
 
-	var idToSend string
-
-	if member != nil {
-		idToSend = member.User.ID.String()
-	} else {
-		idToSend = user.ID.String()
-	}
-
-	cachedVal := lib.GetCache(idToSend + ":" + "pic")
+	cachedVal := lib.GetCache(user.ID().String() + ":" + "pic")
 	if cachedVal != "nil" {
 		return &api.InteractionResponseData{
 			Content: option.NewNullableString("Please wait for the cooldown!"),
 		}
 	}
-	lib.SetCache(idToSend+":"+"pic", idToSend+":"+"pic", 1)
+	lib.SetCache(user.ID().String()+":"+"pic", user.ID().String()+":"+"pic", 1)
 
 	// Command Logic
 	var options struct {
@@ -279,23 +261,15 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	member := data.Event.Member
-	user := data.Event.User
+	user := lib.GetUserObject(*data.Event)
 
-	var idToSend string
-
-	if member != nil {
-		idToSend = member.User.ID.String()
-	} else {
-		idToSend = user.ID.String()
-	}
-	cachedVal := lib.GetCache(idToSend + ":" + "hdpic")
+	cachedVal := lib.GetCache(user.ID().String() + ":" + "hdpic")
 	if cachedVal != "nil" {
 		return &api.InteractionResponseData{
 			Content: option.NewNullableString("Please wait for the cooldown!"),
 		}
 	}
-	lib.SetCache(idToSend+":"+"hdpic", idToSend+":"+"hdpic", 10)
+	lib.SetCache(user.ID().String()+":"+"hdpic", user.ID().String()+":"+"hdpic", 10)
 
 	// Command Logic
 	var options struct {
@@ -354,20 +328,11 @@ func (h *handler) cmdHS(ctx context.Context, data cmdroute.CommandData) *api.Int
 	if err := data.Options.Unmarshal(&options); err != nil {
 		return errorResponse(err)
 	}
-	
-	member := data.Event.Member
-	user := data.Event.User
 
-	var nameToSend string
-
-	if member != nil {
-		nameToSend = member.User.DisplayName
-	} else {
-		nameToSend = user.DisplayName
-	}
+	user := lib.GetUserObject(*data.Event)
 
 	return &api.InteractionResponseData{
-		Content: option.NewNullableString(options.Arg + " was " + nameToSend + "'s nickname in highschool!"),
+		Content: option.NewNullableString(options.Arg + " was " + user.DisplayName() + "'s nickname in highschool!"),
 	}
 }
 
