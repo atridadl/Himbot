@@ -140,7 +140,7 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 	// Command Logic
 	var options struct {
-		Arg string `discord:"prompt"`
+		Prompt string `discord:"prompt"`
 	}
 
 	if err := data.Options.Unmarshal(&options); err != nil {
@@ -156,7 +156,7 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: options.Arg,
+					Content: options.Prompt,
 				},
 			},
 		},
@@ -170,8 +170,24 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 		}
 	}
 
+	respString := resp.Choices[0].Message.Content
+
+	if len(respString) > 1800 {
+		textFile := bytes.NewBuffer([]byte(respString))
+
+		file := sendpart.File{
+			Name:   "himbot_response.txt",
+			Reader: textFile,
+		}
+
+		return &api.InteractionResponseData{
+			Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response:\n"),
+			AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
+			Files:           []sendpart.File{file},
+		}
+	}
 	return &api.InteractionResponseData{
-		Content:         option.NewNullableString(resp.Choices[0].Message.Content),
+		Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response: " + respString),
 		AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
 	}
 }
