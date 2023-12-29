@@ -1,6 +1,9 @@
 package lib
 
 import (
+	"os"
+	"strings"
+
 	"github.com/diamondburned/arikawa/v3/discord"
 )
 
@@ -59,4 +62,23 @@ func GetUserObject(event discord.InteractionEvent) Userish {
 	} else {
 		return directUser{event.User}
 	}
+}
+
+func CooldownHandler(event discord.InteractionEvent) bool {
+	user := GetUserObject(event)
+	allowList := strings.Split(os.Getenv("COOLDOWN_ALLOW_LIST"), ",")
+
+	// Check if the user ID is in the allowList
+	for _, id := range allowList {
+		if id == user.ID().String() {
+			return true
+		}
+	}
+
+	cachedVal := GetCache(user.ID().String() + ":" + "hdpic")
+	if cachedVal != "nil" {
+		return false
+	}
+	SetCache(user.ID().String()+":"+"hdpic", user.ID().String()+":"+"hdpic", 10)
+	return true
 }

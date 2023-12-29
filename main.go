@@ -132,13 +132,11 @@ func (h *handler) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.I
 
 func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	user := lib.GetUserObject(*data.Event)
+	allowed := lib.CooldownHandler(*data.Event)
 
-	cachedVal := lib.GetCache(user.ID().String() + ":" + "ask")
-	if cachedVal != "nil" {
+	if !allowed {
 		return errorResponse(errors.New("please wait for the cooldown"))
 	}
-	lib.SetCache(user.ID().String()+":"+"ask", user.ID().String()+":"+"ask", 1)
 
 	// Command Logic
 	var options struct {
@@ -180,14 +178,11 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	user := lib.GetUserObject(*data.Event)
+	allowed := lib.CooldownHandler(*data.Event)
 
-	cachedVal := lib.GetCache(user.ID().String() + ":" + "pic")
-	if cachedVal != "nil" {
+	if !allowed {
 		return errorResponse(errors.New("please wait for the cooldown"))
-
 	}
-	lib.SetCache(user.ID().String()+":"+"pic", user.ID().String()+":"+"pic", 1)
 
 	// Command Logic
 	var options struct {
@@ -259,13 +254,11 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	user := lib.GetUserObject(*data.Event)
+	allowed := lib.CooldownHandler(*data.Event)
 
-	cachedVal := lib.GetCache(user.ID().String() + ":" + "hdpic")
-	if cachedVal != "nil" {
+	if !allowed {
 		return errorResponse(errors.New("please wait for the cooldown"))
 	}
-	lib.SetCache(user.ID().String()+":"+"hdpic", user.ID().String()+":"+"hdpic", 10)
 
 	// Command Logic
 	var options struct {
