@@ -12,7 +12,7 @@ import (
 type Userish interface {
 	ID() discord.UserID
 	Username() string
-	DisplayName() string // The added method for getting the display name
+	DisplayName() string
 }
 
 // memberUser adapts a discord.Member to the Userish interface.
