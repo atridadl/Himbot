@@ -64,7 +64,7 @@ func GetUserObject(event discord.InteractionEvent) Userish {
 	}
 }
 
-func CooldownHandler(event discord.InteractionEvent, command string, cooldownMinutes int64) bool {
+func CooldownHandler(event discord.InteractionEvent, command string, cooldownMinutes int) bool {
 	user := GetUserObject(event)
 	allowList := strings.Split(os.Getenv("COOLDOWN_ALLOW_LIST"), ",")
 
@@ -75,10 +75,10 @@ func CooldownHandler(event discord.InteractionEvent, command string, cooldownMin
 		}
 	}
 
-	cachedVal := GetCache(user.ID().String() + ":" + "hdpic")
+	cachedVal := GetCache(user.ID().String() + ":" + command)
 	if cachedVal != "nil" {
 		return false
 	}
-	SetCache(user.ID().String()+":"+"hdpic", user.ID().String()+":"+"hdpic", 10)
+	SetCache(user.ID().String()+":"+"hdpic", user.ID().String()+":"+command, cooldownMinutes)
 	return true
 }
