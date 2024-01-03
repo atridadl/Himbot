@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
@@ -132,7 +133,7 @@ func (h *handler) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.I
 
 func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed := lib.CooldownHandler(*data.Event, "ask", 1)
+	allowed := lib.CooldownHandler(*data.Event, "ask", time.Minute)
 
 	if !allowed {
 		return errorResponse(errors.New("please wait for the cooldown"))
@@ -194,7 +195,7 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed := lib.CooldownHandler(*data.Event, "pic", 1)
+	allowed := lib.CooldownHandler(*data.Event, "pic", time.Minute)
 
 	if !allowed {
 		return errorResponse(errors.New("please wait for the cooldown"))
@@ -270,7 +271,7 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed := lib.CooldownHandler(*data.Event, "hdPic", 1)
+	allowed := lib.CooldownHandler(*data.Event, "hdPic", time.Minute*10)
 
 	if !allowed {
 		return errorResponse(errors.New("please wait for the cooldown"))

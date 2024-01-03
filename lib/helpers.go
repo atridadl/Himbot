@@ -3,9 +3,12 @@ package lib
 import (
 	"os"
 	"strings"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 )
+
+var manager = NewCooldownManager()
 
 // Userish is an interface that captures the common methods you may want to call
 // on either a discord.Member or discord.User, including a display name.
@@ -64,7 +67,7 @@ func GetUserObject(event discord.InteractionEvent) Userish {
 	}
 }
 
-func CooldownHandler(event discord.InteractionEvent, command string, cooldownMinutes int) bool {
+func CooldownHandler(event discord.InteractionEvent, key string, duration time.Duration) bool {
 	user := GetUserObject(event)
 	allowList := strings.Split(os.Getenv("COOLDOWN_ALLOW_LIST"), ",")
 
@@ -75,10 +78,10 @@ func CooldownHandler(event discord.InteractionEvent, command string, cooldownMin
 		}
 	}
 
-	cachedVal := GetCache(user.ID().String() + ":" + command)
-	if cachedVal != "nil" {
+	if manager.IsOnCooldown(key) {
 		return false
 	}
-	SetCache(user.ID().String()+":"+"hdpic", user.ID().String()+":"+command, cooldownMinutes)
+
+	manager.StartCooldown(key, duration)
 	return true
 }
