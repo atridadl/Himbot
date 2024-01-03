@@ -64,7 +64,7 @@ func GetUserObject(event discord.InteractionEvent) Userish {
 	}
 }
 
-func CooldownHandler(event discord.InteractionEvent) bool {
+func CooldownHandler(event discord.InteractionEvent, command string, cooldownMinutes int64) bool {
 	user := GetUserObject(event)
 	allowList := strings.Split(os.Getenv("COOLDOWN_ALLOW_LIST"), ",")
 

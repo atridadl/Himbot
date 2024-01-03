@@ -19,6 +19,6 @@ require (
 	github.com/mediocregopher/radix/v4 v4.1.4
 	github.com/redis/go-redis/v9 v9.3.1
 	github.com/replicate/replicate-go v0.14.2
-	github.com/sashabaranov/go-openai v1.17.9
+	github.com/sashabaranov/go-openai v1.17.10
 	golang.org/x/time v0.5.0 // indirect
 )

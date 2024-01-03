@@ -132,7 +132,7 @@ func (h *handler) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.I
 
 func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed := lib.CooldownHandler(*data.Event)
+	allowed := lib.CooldownHandler(*data.Event, "ask", 1)
 
 	if !allowed {
 		return errorResponse(errors.New("please wait for the cooldown"))
@@ -194,7 +194,7 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed := lib.CooldownHandler(*data.Event)
+	allowed := lib.CooldownHandler(*data.Event, "pic", 1)
 
 	if !allowed {
 		return errorResponse(errors.New("please wait for the cooldown"))
@@ -270,7 +270,7 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed := lib.CooldownHandler(*data.Event)
+	allowed := lib.CooldownHandler(*data.Event, "hdPic", 1)
 
 	if !allowed {
 		return errorResponse(errors.New("please wait for the cooldown"))
