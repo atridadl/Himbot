@@ -235,13 +235,13 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 	test, ok := prediction.([]interface{})
 
 	if !ok {
-		return errorResponse(errors.New("prediction is not []interface{}"))
+		return errorResponse(errors.New("there was an error generating the image based on this prompt... this usually happens when the generated image violates safety requirements"))
 	}
 
 	imgUrl, ok := test[0].(string)
 
 	if !ok {
-		return errorResponse(errors.New("prediction.Output[0] is not a string"))
+		return errorResponse(errors.New("there was an error generating the image based on this prompt... this usually happens when the generated image violates safety requirements"))
 	}
 
 	imageRes, imageGetErr := http.Get(imgUrl)
