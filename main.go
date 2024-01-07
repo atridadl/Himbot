@@ -235,13 +235,13 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 	test, ok := prediction.([]interface{})
 
 	if !ok {
-		fmt.Println("prediction is not []interface{}")
+		return errorResponse(errors.New("prediction is not []interface{}"))
 	}
 
 	imgUrl, ok := test[0].(string)
 
 	if !ok {
-		fmt.Println("prediction.Output[0] is not a string")
+		return errorResponse(errors.New("prediction.Output[0] is not a string"))
 	}
 
 	imageRes, imageGetErr := http.Get(imgUrl)
