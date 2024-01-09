@@ -1,17 +1,14 @@
-FROM golang:1.21.5
+FROM golang:1.21.6 as build
 
 WORKDIR /app
 
-ADD . /lib
-
-COPY go.mod .
-COPY go.sum .
-COPY main.go .
+COPY . .
 
 RUN go mod download
+RUN CGO_ENABLED=0 go build -o /go/bin/app
 
-COPY ./lib ./lib
+FROM gcr.io/distroless/base-debian12
 
-RUN go build .
+COPY --from=build /go/bin/app /
 
-CMD [ "./himbot" ]
+CMD [ "/app" ]
