@@ -29,7 +29,7 @@ var commands = []api.CreateCommandData{
 	},
 	{
 		Name:        "ask",
-		Description: "Ask Himbot! Cooldown: 1 Minute.",
+		Description: "Ask Himbot! Cooldown: 2 Minutes.",
 		Options: []discord.CommandOption{
 			&discord.StringOption{
 				OptionName:  "prompt",
@@ -118,10 +118,10 @@ func (h *handler) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.I
 
 func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed := lib.CooldownHandler(*data.Event, "ask", time.Minute)
+	allowed, cooldownString := lib.CooldownHandler(*data.Event, "ask", time.Minute)
 
 	if !allowed {
-		return errorResponse(errors.New("please wait for the cooldown"))
+		return errorResponse(errors.New(cooldownString))
 	}
 
 	// Command Logic
@@ -167,10 +167,10 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed := lib.CooldownHandler(*data.Event, "pic", time.Minute)
+	allowed, cooldownString := lib.CooldownHandler(*data.Event, "pic", time.Minute*2)
 
 	if !allowed {
-		return errorResponse(errors.New("please wait for the cooldown"))
+		return errorResponse(errors.New(cooldownString))
 	}
 
 	// Command Logic

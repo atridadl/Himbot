@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -67,21 +68,22 @@ func GetUserObject(event discord.InteractionEvent) Userish {
 	}
 }
 
-func CooldownHandler(event discord.InteractionEvent, key string, duration time.Duration) bool {
+func CooldownHandler(event discord.InteractionEvent, key string, duration time.Duration) (bool, string) {
 	user := GetUserObject(event)
 	allowList := strings.Split(os.Getenv("COOLDOWN_ALLOW_LIST"), ",")
 
 	// Check if the user ID is in the allowList
 	for _, id := range allowList {
 		if id == user.ID().String() {
-			return true
+			return true, ""
 		}
 	}
 
-	if manager.IsOnCooldown(user.ID().String(), key) {
-		return false
+	isOnCooldown, remaining := manager.IsOnCooldown(user.ID().String(), key)
+	if isOnCooldown {
+		return false, fmt.Sprintf("You are on cooldown. Please wait for %v", remaining)
 	}
 
 	manager.StartCooldown(user.ID().String(), key, duration)
-	return true
+	return true, ""
 }

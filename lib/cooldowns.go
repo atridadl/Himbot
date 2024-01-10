@@ -41,21 +41,21 @@ func (m *CooldownManager) StartCooldown(userID string, key string, duration time
 	m.cooldowns[userID+":"+key] = time.Now().Add(duration)
 }
 
-func (m *CooldownManager) IsOnCooldown(userID string, key string) bool {
+func (m *CooldownManager) IsOnCooldown(userID string, key string) (bool, time.Duration) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	cooldownEnd, exists := m.cooldowns[userID+":"+key]
 	if !exists {
-		return false
+		return false, 0
 	}
 
 	if time.Now().After(cooldownEnd) {
 		delete(m.cooldowns, userID+":"+key)
-		return false
+		return false, 0
 	}
 
-	return true
+	return true, time.Until(cooldownEnd)
 }
 
 func CancelCooldown(userID string, key string) {
