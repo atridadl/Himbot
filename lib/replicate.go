@@ -18,7 +18,8 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 	}
 
 	input := replicate.PredictionInput{
-		"prompt": prompt,
+		"prompt":         prompt,
+		"max_new_tokens": 4096,
 	}
 	webhook := replicate.Webhook{
 		URL:    "https://example.com/webhook",
