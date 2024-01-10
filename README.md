@@ -11,7 +11,6 @@ A discord bot written in Go.
 -   Copy .env.example and rename to .env
 -   Create a Discord Bot with all gateway permissions enabled
 -   Generate a token for this discord bot and paste it in the .env for DISCORD_TOKEN
--   Generate and provide an OpenAPI token and paste it in the .env for OPENAI_API_KEY
 -   Generate and provide an Replicate token and paste it in the .env for REPLICATE_API_TOKEN
 -   Run `go run main.go` to run locally
 
