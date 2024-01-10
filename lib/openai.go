@@ -3,9 +3,9 @@ package lib
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -47,16 +47,15 @@ func OpenAITextGeneration(prompt string) (string, error) {
 	return resp.Choices[0].Message.Content, nil
 }
 
-func OpenAIImageGeneration(prompt string) (*bytes.Buffer, error) {
-	// Send the generation request to DALL·E 3
+func OpenAIImageGeneration(prompt string) (imageFile *bytes.Buffer, err error) {
 	resp, err := client.CreateImage(context.Background(), openai.ImageRequest{
 		Prompt: prompt,
 		Model:  "dall-e-3",
 		Size:   "1024x1024",
 	})
+
 	if err != nil {
-		log.Printf("Image creation error: %v\n", err)
-		return nil, fmt.Errorf("failed to generate image")
+		return nil, errors.New("there was an error generating the image based on this prompt... this usually happens when the generated image violates safety requirements")
 	}
 
 	imageRes, err := http.Get(resp.Data[0].URL)
@@ -73,6 +72,5 @@ func OpenAIImageGeneration(prompt string) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
-	imageFile := bytes.NewBuffer(imageBytes)
-	return imageFile, nil
+	return bytes.NewBuffer(imageBytes), nil
 }

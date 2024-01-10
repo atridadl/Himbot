@@ -40,18 +40,7 @@ var commands = []api.CreateCommandData{
 	},
 	{
 		Name:        "pic",
-		Description: "Generate an image using Stable Diffusion! Cooldown: 1 Minute.",
-		Options: []discord.CommandOption{
-			&discord.StringOption{
-				OptionName:  "prompt",
-				Description: "The prompt for the image generation.",
-				Required:    true,
-			},
-		},
-	},
-	{
-		Name:        "hdpic",
-		Description: "Generate an image using DALL·E 3! Cooldown: 10 Minutes.",
+		Description: "Generate an image! Cooldown: 1 Minute.",
 		Options: []discord.CommandOption{
 			&discord.StringOption{
 				OptionName:  "prompt",
@@ -115,7 +104,6 @@ func newHandler(s *state.State) *handler {
 	h.AddFunc("ping", h.cmdPing)
 	h.AddFunc("ask", h.cmdAsk)
 	h.AddFunc("pic", h.cmdPic)
-	h.AddFunc("hdpic", h.cmdHDPic)
 	h.AddFunc("hs", h.cmdHS)
 
 	return h
@@ -142,6 +130,7 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 	}
 
 	if err := data.Options.Unmarshal(&options); err != nil {
+		lib.CancelCooldown(data.Event.User.ID.String(), "ask")
 		return errorResponse(err)
 	}
 
@@ -149,6 +138,7 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 	if err != nil {
 		fmt.Printf("ChatCompletion error: %v\n", err)
+		lib.CancelCooldown(data.Event.User.ID.String(), "ask")
 		return &api.InteractionResponseData{
 			Content:         option.NewNullableString("ChatCompletion Error!"),
 			AllowedMentions: &api.AllowedMentions{},
@@ -189,46 +179,14 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 	}
 
 	if err := data.Options.Unmarshal(&options); err != nil {
+		lib.CancelCooldown(data.Event.User.ID.String(), "pic")
 		return errorResponse(err)
 	}
 
 	imageFile, err := lib.ReplicateImageGeneration(options.Prompt)
 
 	if err != nil {
-		return errorResponse(err)
-	}
-
-	file := sendpart.File{
-		Name:   "himbot_response.png",
-		Reader: imageFile,
-	}
-
-	return &api.InteractionResponseData{
-		Content: option.NewNullableString("Prompt: " + options.Prompt),
-		Files:   []sendpart.File{file},
-	}
-}
-
-func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	// Cooldown Logic
-	allowed := lib.CooldownHandler(*data.Event, "hdPic", time.Minute*10)
-
-	if !allowed {
-		return errorResponse(errors.New("please wait for the cooldown"))
-	}
-
-	// Command Logic
-	var options struct {
-		Prompt string `discord:"prompt"`
-	}
-
-	if err := data.Options.Unmarshal(&options); err != nil {
-		return errorResponse(err)
-	}
-
-	imageFile, err := lib.OpenAIImageGeneration(options.Prompt)
-
-	if err != nil {
+		lib.CancelCooldown(data.Event.User.ID.String(), "pic")
 		return errorResponse(err)
 	}
 

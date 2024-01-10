@@ -78,10 +78,10 @@ func CooldownHandler(event discord.InteractionEvent, key string, duration time.D
 		}
 	}
 
-	if manager.IsOnCooldown(key) {
+	if manager.IsOnCooldown(user.ID().String(), key) {
 		return false
 	}
 
-	manager.StartCooldown(key, duration)
+	manager.StartCooldown(user.ID().String(), key, duration)
 	return true
 }
