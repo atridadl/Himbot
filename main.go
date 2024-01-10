@@ -145,13 +145,13 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 		return errorResponse(err)
 	}
 
-	respString, err := lib.OpenAITextGeneration(options.Prompt)
+	respString, err := lib.ReplicateTextGeneration(options.Prompt)
 
 	if err != nil {
 		fmt.Printf("ChatCompletion error: %v\n", err)
 		return &api.InteractionResponseData{
 			Content:         option.NewNullableString("ChatCompletion Error!"),
-			AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
+			AllowedMentions: &api.AllowedMentions{},
 		}
 	}
 
@@ -165,13 +165,13 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 
 		return &api.InteractionResponseData{
 			Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response:\n"),
-			AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
+			AllowedMentions: &api.AllowedMentions{},
 			Files:           []sendpart.File{file},
 		}
 	}
 	return &api.InteractionResponseData{
 		Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response: " + respString),
-		AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
+		AllowedMentions: &api.AllowedMentions{},
 	}
 }
 
