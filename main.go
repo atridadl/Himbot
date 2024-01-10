@@ -8,6 +8,7 @@ import (
 	"himbot/lib"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -25,6 +26,7 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
+// Command metadata
 var commands = []api.CreateCommandData{
 	{
 		Name:        "ping",
@@ -76,6 +78,7 @@ var commands = []api.CreateCommandData{
 	},
 }
 
+// Entrypoint
 func main() {
 	godotenv.Load(".env")
 
@@ -148,7 +151,8 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 		return errorResponse(err)
 	}
 
-	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
+	apiKey := os.Getenv("OPENAI_API_KEY")
+	client := openai.NewClient(apiKey)
 
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
@@ -164,32 +168,18 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 	)
 
 	if err != nil {
-		fmt.Printf("ChatCompletion error: %v\n", err)
-		return &api.InteractionResponseData{
-			Content:         option.NewNullableString("ChatCompletion Error!"),
-			AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
-		}
+		return errorResponse(err)
 	}
 
 	respString := resp.Choices[0].Message.Content
 
 	if len(respString) > 1800 {
-		textFile := bytes.NewBuffer([]byte(respString))
-
-		file := sendpart.File{
-			Name:   "himbot_response.txt",
-			Reader: textFile,
-		}
-
-		return &api.InteractionResponseData{
-			Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response:\n"),
-			AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
-			Files:           []sendpart.File{file},
-		}
+		respString = respString[:1800]
 	}
+
 	return &api.InteractionResponseData{
 		Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response: " + respString),
-		AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
+		AllowedMentions: &api.AllowedMentions{},
 	}
 }
 
@@ -343,9 +333,19 @@ func (h *handler) cmdHS(ctx context.Context, data cmdroute.CommandData) *api.Int
 }
 
 func errorResponse(err error) *api.InteractionResponseData {
+	var content string
+	switch e := err.(type) {
+	case *net.OpError:
+		content = "**Network Error:** " + e.Error()
+	case *os.PathError:
+		content = "**File Error:** " + e.Error()
+	default:
+		content = "**Error:** " + err.Error()
+	}
+
 	return &api.InteractionResponseData{
-		Content:         option.NewNullableString("**Error:** " + err.Error()),
+		Content:         option.NewNullableString(content),
 		Flags:           discord.EphemeralMessage,
-		AllowedMentions: &api.AllowedMentions{ /* none */ },
+		AllowedMentions: &api.AllowedMentions{},
 	}
 }
