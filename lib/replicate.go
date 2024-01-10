@@ -58,7 +58,10 @@ func ReplicateImageGeneration(prompt string) (*bytes.Buffer, error) {
 	}
 
 	input := replicate.PredictionInput{
-		"prompt": prompt,
+		"prompt":                 prompt,
+		"refiner":                "expert_ensemble_refiner",
+		"num_inference_steps":    69,
+		"disable_safety_checker": true,
 	}
 	webhook := replicate.Webhook{
 		URL:    "https://example.com/webhook",
