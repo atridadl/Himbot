@@ -5,11 +5,13 @@ go 1.21.6
 require github.com/diamondburned/arikawa/v3 v3.3.4
 
 require (
+	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 )
 
 require (
+	github.com/diamondburned/arikawa v1.3.14
 	github.com/gorilla/schema v1.2.1 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/joho/godotenv v1.5.1

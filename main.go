@@ -6,10 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"himbot/lib"
-	"io"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -22,11 +20,8 @@ import (
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/joho/godotenv"
-	"github.com/replicate/replicate-go"
-	openai "github.com/sashabaranov/go-openai"
 )
 
-// Command metadata
 var commands = []api.CreateCommandData{
 	{
 		Name:        "ping",
@@ -78,7 +73,6 @@ var commands = []api.CreateCommandData{
 	},
 }
 
-// Entrypoint
 func main() {
 	godotenv.Load(".env")
 
@@ -151,35 +145,33 @@ func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.In
 		return errorResponse(err)
 	}
 
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	client := openai.NewClient(apiKey)
-
-	resp, err := client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: openai.GPT4TurboPreview,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: options.Prompt,
-				},
-			},
-		},
-	)
+	respString, err := lib.OpenAITextGeneration(options.Prompt)
 
 	if err != nil {
-		return errorResponse(err)
+		fmt.Printf("ChatCompletion error: %v\n", err)
+		return &api.InteractionResponseData{
+			Content:         option.NewNullableString("ChatCompletion Error!"),
+			AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
+		}
 	}
-
-	respString := resp.Choices[0].Message.Content
 
 	if len(respString) > 1800 {
-		respString = respString[:1800]
-	}
+		textFile := bytes.NewBuffer([]byte(respString))
 
+		file := sendpart.File{
+			Name:   "himbot_response.txt",
+			Reader: textFile,
+		}
+
+		return &api.InteractionResponseData{
+			Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response:\n"),
+			AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
+			Files:           []sendpart.File{file},
+		}
+	}
 	return &api.InteractionResponseData{
 		Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response: " + respString),
-		AllowedMentions: &api.AllowedMentions{},
+		AllowedMentions: &api.AllowedMentions{}, // don't mention anyone
 	}
 }
 
@@ -200,53 +192,11 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 		return errorResponse(err)
 	}
 
-	client, clientError := replicate.NewClient(replicate.WithTokenFromEnv())
-	if clientError != nil {
-		return errorResponse(clientError)
-	}
-	if err := data.Options.Unmarshal(&options); err != nil {
+	imageFile, err := lib.ReplicateImageGeneration(options.Prompt)
+
+	if err != nil {
 		return errorResponse(err)
 	}
-
-	input := replicate.PredictionInput{
-		"prompt": options.Prompt,
-	}
-	webhook := replicate.Webhook{
-		URL:    "https://example.com/webhook",
-		Events: []replicate.WebhookEventType{"start", "completed"},
-	}
-
-	prediction, predictionError := client.Run(context.Background(), "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", input, &webhook)
-
-	if predictionError != nil {
-		return errorResponse(predictionError)
-	}
-
-	test, ok := prediction.([]interface{})
-
-	if !ok {
-		return errorResponse(errors.New("there was an error generating the image based on this prompt... this usually happens when the generated image violates safety requirements"))
-	}
-
-	imgUrl, ok := test[0].(string)
-
-	if !ok {
-		return errorResponse(errors.New("there was an error generating the image based on this prompt... this usually happens when the generated image violates safety requirements"))
-	}
-
-	imageRes, imageGetErr := http.Get(imgUrl)
-	if imageGetErr != nil {
-		return errorResponse(imageGetErr)
-	}
-
-	defer imageRes.Body.Close()
-
-	imageBytes, imgReadErr := io.ReadAll(imageRes.Body)
-	if imgReadErr != nil {
-		return errorResponse(imgReadErr)
-	}
-
-	imageFile := bytes.NewBuffer(imageBytes)
 
 	file := sendpart.File{
 		Name:   "himbot_response.png",
@@ -276,34 +226,11 @@ func (h *handler) cmdHDPic(ctx context.Context, data cmdroute.CommandData) *api.
 		return errorResponse(err)
 	}
 
-	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
-
-	// Send the generation request to DALL·E 3
-	resp, err := client.CreateImage(context.Background(), openai.ImageRequest{
-		Prompt: options.Prompt,
-		Model:  "dall-e-3",
-		Size:   "1024x1024",
-	})
-	if err != nil {
-		log.Printf("Image creation error: %v\n", err)
-		return errorResponse(fmt.Errorf("failed to generate image"))
-	}
-
-	imageRes, err := http.Get(resp.Data[0].URL)
+	imageFile, err := lib.OpenAIImageGeneration(options.Prompt)
 
 	if err != nil {
 		return errorResponse(err)
 	}
-
-	defer imageRes.Body.Close()
-
-	imageBytes, err := io.ReadAll(imageRes.Body)
-
-	if err != nil {
-		return errorResponse(err)
-	}
-
-	imageFile := bytes.NewBuffer(imageBytes)
 
 	file := sendpart.File{
 		Name:   "himbot_response.png",
