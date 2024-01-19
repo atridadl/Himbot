@@ -54,7 +54,7 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 	return result, nil
 }
 
-func ReplicateImageGeneration(prompt string) (*bytes.Buffer, error) {
+func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, error) {
 	client, clientError := replicate.NewClient(replicate.WithTokenFromEnv())
 	if clientError != nil {
 		return nil, clientError
@@ -102,10 +102,19 @@ func ReplicateImageGeneration(prompt string) (*bytes.Buffer, error) {
 	}
 
 	// Save image to a temporary file
-	tmpfile, err := os.CreateTemp("", "image.*.jpg")
+	var tmpfile *os.File
+	var err error
+
+	if filename != "" {
+		tmpfile, err = os.CreateTemp("", filename)
+	} else {
+		tmpfile, err = os.CreateTemp("", "image.*.jpg")
+	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer os.Remove(tmpfile.Name())
 
 	if _, err := tmpfile.Write(imageBytes); err != nil {

@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"strconv"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -183,7 +184,13 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 		return errorResponse(err)
 	}
 
-	imageFile, err := lib.ReplicateImageGeneration(options.Prompt)
+	// Get current epoch timestamp
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+
+	// Concatenate clean username and timestamp to form filename
+	filename := data.Event.Sender().Username + "_" + timestamp + ".jpg"
+
+	imageFile, err := lib.ReplicateImageGeneration(options.Prompt, filename)
 
 	if err != nil {
 		lib.CancelCooldown(data.Event.User.ID.String(), "pic")
@@ -191,7 +198,7 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 	}
 
 	file := sendpart.File{
-		Name:   "himbot_response.png",
+		Name:   filename,
 		Reader: imageFile,
 	}
 
