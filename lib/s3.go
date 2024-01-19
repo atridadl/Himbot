@@ -22,6 +22,7 @@ func UploadToS3(filePath string) (*s3manager.UploadOutput, error) {
 	secretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
 
 	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String("us-west-2"),
 		Credentials: credentials.NewStaticCredentials(
 			accessKeyID,
 			secretAccessKey,
