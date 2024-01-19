@@ -5,7 +5,9 @@ import (
 	"context"
 	"errors"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/replicate/replicate-go"
@@ -97,6 +99,26 @@ func ReplicateImageGeneration(prompt string) (*bytes.Buffer, error) {
 	imageBytes, imgReadErr := io.ReadAll(imageRes.Body)
 	if imgReadErr != nil {
 		return nil, imgReadErr
+	}
+
+	// Save image to a temporary file
+	tmpfile, err := os.CreateTemp("", "image.*.jpg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.Remove(tmpfile.Name())
+
+	if _, err := tmpfile.Write(imageBytes); err != nil {
+		log.Fatal(err)
+	}
+	if err := tmpfile.Close(); err != nil {
+		log.Fatal(err)
+	}
+
+	// Upload the image to S3
+	_, uploadErr := UploadToS3(tmpfile.Name())
+	if uploadErr != nil {
+		log.Printf("Failed to upload image to S3: %v", uploadErr)
 	}
 
 	imageFile := bytes.NewBuffer(imageBytes)
