@@ -12,6 +12,7 @@ import (
 
 func UploadToS3(filePath string) (*s3manager.UploadOutput, error) {
 	bucket := os.Getenv("BUCKET_NAME")
+	fmt.Println("The filepath is: ", filePath)
 	if bucket == "" {
 		fmt.Println("No S3 bucket specified, skipping upload.")
 		return nil, nil

@@ -102,14 +102,7 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 	}
 
 	// Save image to a temporary file
-	var tmpfile *os.File
-	var err error
-
-	if filename != "" {
-		tmpfile, err = os.CreateTemp("", filename)
-	} else {
-		tmpfile, err = os.CreateTemp("", "image.*.jpg")
-	}
+	tmpfile, err := os.Create(filename)
 
 	if err != nil {
 		log.Fatal(err)
