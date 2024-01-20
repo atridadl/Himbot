@@ -189,7 +189,6 @@ func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.In
 
 	// Concatenate clean username and timestamp to form filename
 	filename := data.Event.Sender().Username + "_" + timestamp + ".jpg"
-	fmt.Println("The filename is: ", filename)
 
 	imageFile, err := lib.ReplicateImageGeneration(options.Prompt, filename)
 

@@ -12,7 +12,6 @@ import (
 
 func UploadToS3(filePath string) (*s3manager.UploadOutput, error) {
 	bucket := os.Getenv("BUCKET_NAME")
-	fmt.Println("The filepath is: ", filePath)
 	if bucket == "" {
 		fmt.Println("No S3 bucket specified, skipping upload.")
 		return nil, nil
@@ -21,9 +20,10 @@ func UploadToS3(filePath string) (*s3manager.UploadOutput, error) {
 	endpoint := os.Getenv("AWS_ENDPOINT_URL_S3")
 	accessKeyID := os.Getenv("AWS_ACCESS_KEY_ID")
 	secretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+	region := os.Getenv("AWS_REGION")
 
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("us-west-2"),
+		Region: &region,
 		Credentials: credentials.NewStaticCredentials(
 			accessKeyID,
 			secretAccessKey,
