@@ -1,25 +1,17 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"errors"
-	"fmt"
-	"himbot/lib"
+	"himbot/command"
 	"log"
-	"net"
 	"os"
 	"os/signal"
-	"strconv"
-	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
-	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/joho/godotenv"
 )
 
@@ -102,142 +94,10 @@ func newHandler(s *state.State) *handler {
 	h.Router = cmdroute.NewRouter()
 	// Automatically defer handles if they're slow.
 	h.Use(cmdroute.Deferrable(s, cmdroute.DeferOpts{}))
-	h.AddFunc("ping", h.cmdPing)
-	h.AddFunc("ask", h.cmdAsk)
-	h.AddFunc("pic", h.cmdPic)
-	h.AddFunc("hs", h.cmdHS)
+	h.AddFunc("ping", command.Ping)
+	h.AddFunc("ask", command.Ask)
+	h.AddFunc("pic", command.Pic)
+	h.AddFunc("hs", command.HS)
 
 	return h
-}
-
-func (h *handler) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	// Command Logic
-	return &api.InteractionResponseData{
-		Content: option.NewNullableString("Pong!"),
-	}
-}
-
-func (h *handler) cmdAsk(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	// Cooldown Logic
-	allowed, cooldownString := lib.CooldownHandler(*data.Event, "ask", time.Minute)
-
-	if !allowed {
-		return errorResponse(errors.New(cooldownString))
-	}
-
-	// Command Logic
-	var options struct {
-		Prompt string `discord:"prompt"`
-	}
-
-	if err := data.Options.Unmarshal(&options); err != nil {
-		lib.CancelCooldown(data.Event.User.ID.String(), "ask")
-		return errorResponse(err)
-	}
-
-	respString, err := lib.ReplicateTextGeneration(options.Prompt)
-
-	if err != nil {
-		fmt.Printf("ChatCompletion error: %v\n", err)
-		lib.CancelCooldown(data.Event.User.ID.String(), "ask")
-		return &api.InteractionResponseData{
-			Content:         option.NewNullableString("ChatCompletion Error!"),
-			AllowedMentions: &api.AllowedMentions{},
-		}
-	}
-
-	if len(respString) > 1800 {
-		textFile := bytes.NewBuffer([]byte(respString))
-
-		file := sendpart.File{
-			Name:   "himbot_response.txt",
-			Reader: textFile,
-		}
-
-		return &api.InteractionResponseData{
-			Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response:\n"),
-			AllowedMentions: &api.AllowedMentions{},
-			Files:           []sendpart.File{file},
-		}
-	}
-	return &api.InteractionResponseData{
-		Content:         option.NewNullableString("Prompt: " + options.Prompt + "\n" + "Response: " + respString),
-		AllowedMentions: &api.AllowedMentions{},
-	}
-}
-
-func (h *handler) cmdPic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	// Cooldown Logic
-	allowed, cooldownString := lib.CooldownHandler(*data.Event, "pic", time.Minute*2)
-
-	if !allowed {
-		return errorResponse(errors.New(cooldownString))
-	}
-
-	// Command Logic
-	var options struct {
-		Prompt string `discord:"prompt"`
-	}
-
-	if err := data.Options.Unmarshal(&options); err != nil {
-		lib.CancelCooldown(data.Event.User.ID.String(), "pic")
-		return errorResponse(err)
-	}
-
-	// Get current epoch timestamp
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-
-	// Concatenate clean username and timestamp to form filename
-	filename := data.Event.Sender().Username + "_" + timestamp + ".jpg"
-
-	imageFile, err := lib.ReplicateImageGeneration(options.Prompt, filename)
-
-	if err != nil {
-		lib.CancelCooldown(data.Event.User.ID.String(), "pic")
-		return errorResponse(err)
-	}
-
-	file := sendpart.File{
-		Name:   filename,
-		Reader: imageFile,
-	}
-
-	return &api.InteractionResponseData{
-		Content: option.NewNullableString("Prompt: " + options.Prompt),
-		Files:   []sendpart.File{file},
-	}
-}
-
-func (h *handler) cmdHS(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	var options struct {
-		Arg string `discord:"nickname"`
-	}
-
-	if err := data.Options.Unmarshal(&options); err != nil {
-		return errorResponse(err)
-	}
-
-	user := lib.GetUserObject(*data.Event)
-
-	return &api.InteractionResponseData{
-		Content: option.NewNullableString(options.Arg + " was " + user.DisplayName() + "'s nickname in highschool!"),
-	}
-}
-
-func errorResponse(err error) *api.InteractionResponseData {
-	var content string
-	switch e := err.(type) {
-	case *net.OpError:
-		content = "**Network Error:** " + e.Error()
-	case *os.PathError:
-		content = "**File Error:** " + e.Error()
-	default:
-		content = "**Error:** " + err.Error()
-	}
-
-	return &api.InteractionResponseData{
-		Content:         option.NewNullableString(content),
-		Flags:           discord.EphemeralMessage,
-		AllowedMentions: &api.AllowedMentions{},
-	}
 }

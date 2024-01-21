@@ -20,15 +20,14 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 	}
 
 	input := replicate.PredictionInput{
-		"prompt":         prompt,
-		"max_new_tokens": 4096,
+		"prompt": prompt,
 	}
 	webhook := replicate.Webhook{
 		URL:    "https://example.com/webhook",
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "mistralai/mistral-7b-instruct-v0.2:79052a3adbba8116ebc6697dcba67ad0d58feff23e7aeb2f103fc9aa545f9269", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "meta/llama-2-70b-chat:2d19859030ff705a87c746f7e96eea03aefb71f166725aee39692f1476566d48", input, &webhook)
 
 	if predictionError != nil {
 		return "", predictionError
