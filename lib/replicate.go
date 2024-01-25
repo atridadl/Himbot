@@ -33,10 +33,14 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 		return "", predictionError
 	}
 
+	if prediction == nil {
+		return "", errors.New("there was an error generating a response based on this prompt... please reach out to @himbothyswaggins to fix this issue")
+	}
+
 	test, ok := prediction.([]interface{})
 
 	if !ok {
-		return "", errors.New("there was an error generating the image based on this prompt... this usually happens when the generated image violates safety requirements")
+		return "", errors.New("there was an error generating a response based on this prompt... please reach out to @himbothyswaggins to fix this issue")
 	}
 
 	strs := make([]string, len(test))
@@ -76,16 +80,20 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		return nil, predictionError
 	}
 
+	if prediction == nil {
+		return nil, errors.New("there was an error generating the image based on this prompt... please reach out to @himbothyswaggins to fix this issue")
+	}
+
 	test, ok := prediction.([]interface{})
 
 	if !ok {
-		return nil, errors.New("there was an error generating the image based on this prompt... this usually happens when the generated image violates safety requirements")
+		return nil, errors.New("there was an error generating the image based on this prompt... please reach out to @himbothyswaggins to fix this issue")
 	}
 
 	imgUrl, ok := test[0].(string)
 
 	if !ok {
-		return nil, errors.New("there was an error generating the image based on this prompt... this usually happens when the generated image violates safety requirements")
+		return nil, errors.New("there was an error generating the image based on this prompt... please reach out to @himbothyswaggins to fix this issue")
 	}
 
 	imageRes, imageGetErr := http.Get(imgUrl)
