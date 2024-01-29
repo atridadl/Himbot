@@ -20,7 +20,7 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 	}
 
 	input := replicate.PredictionInput{
-		"prompt":          prompt,
+		"prompt":          "Respond to the following prompt as the helpful but sarcastic and witty discord assistant called Himbot: " + prompt,
 		"max_new_tokens":  4096,
 		"prompt_template": "<s>[INST] {prompt} [/INST]",
 	}
