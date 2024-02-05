@@ -14,9 +14,9 @@ import (
 	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 )
 
-func Ask(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+func Code(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed, cooldownString := lib.CooldownHandler(*data.Event, "ask", time.Minute)
+	allowed, cooldownString := lib.CooldownHandler(*data.Event, "code", time.Minute)
 
 	if !allowed {
 		return lib.ErrorResponse(errors.New(cooldownString))
@@ -32,7 +32,7 @@ func Ask(ctx context.Context, data cmdroute.CommandData) *api.InteractionRespons
 		return lib.ErrorResponse(err)
 	}
 
-	respString, err := lib.ReplicateTextGeneration(options.Prompt)
+	respString, err := lib.ReplicateCodeGeneration(options.Prompt)
 
 	if err != nil {
 		fmt.Printf("ChatCompletion error: %v\n", err)

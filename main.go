@@ -32,6 +32,17 @@ var commands = []api.CreateCommandData{
 		},
 	},
 	{
+		Name:        "code",
+		Description: "Ask Himbot programming questions! Cooldown: 2 Minutes.",
+		Options: []discord.CommandOption{
+			&discord.StringOption{
+				OptionName:  "prompt",
+				Description: "The prompt to send to Himbot.",
+				Required:    true,
+			},
+		},
+	},
+	{
 		Name:        "pic",
 		Description: "Generate an image! Cooldown: 1 Minute.",
 		Options: []discord.CommandOption{
@@ -96,6 +107,7 @@ func newHandler(s *state.State) *handler {
 	h.Use(cmdroute.Deferrable(s, cmdroute.DeferOpts{}))
 	h.AddFunc("ping", command.Ping)
 	h.AddFunc("ask", command.Ask)
+	h.AddFunc("code", command.Code)
 	h.AddFunc("pic", command.Pic)
 	h.AddFunc("hs", command.HS)
 

@@ -13,6 +13,8 @@ import (
 	"github.com/replicate/replicate-go"
 )
 
+var PromptPrefix = "Ready for a dose of sarcasm and wit? Himbot, your Discord assistant, is up for the challenge. Hit it with the prompt:"
+
 func ReplicateTextGeneration(prompt string) (string, error) {
 	client, clientError := replicate.NewClient(replicate.WithTokenFromEnv())
 	if clientError != nil {
@@ -20,7 +22,7 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 	}
 
 	input := replicate.PredictionInput{
-		"prompt":          "Respond to the following prompt as the helpful but sarcastic and witty discord assistant called Himbot: " + prompt,
+		"prompt":          PromptPrefix + prompt,
 		"max_new_tokens":  4096,
 		"prompt_template": "<s>[INST] {prompt} [/INST]",
 	}
@@ -30,6 +32,51 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 	}
 
 	prediction, predictionError := client.Run(context.Background(), "mistralai/mistral-7b-instruct-v0.2:79052a3adbba8116ebc6697dcba67ad0d58feff23e7aeb2f103fc9aa545f9269", input, &webhook)
+
+	if predictionError != nil {
+		return "", predictionError
+	}
+
+	if prediction == nil {
+		return "", errors.New("there was an error generating a response based on this prompt... please reach out to @himbothyswaggins to fix this issue")
+	}
+
+	test, ok := prediction.([]interface{})
+
+	if !ok {
+		return "", errors.New("there was an error generating a response based on this prompt... please reach out to @himbothyswaggins to fix this issue")
+	}
+
+	strs := make([]string, len(test))
+	for i, v := range test {
+		str, ok := v.(string)
+		if !ok {
+			return "", errors.New("element is not a string")
+		}
+		strs[i] = str
+	}
+
+	result := strings.Join(strs, "")
+
+	return result, nil
+}
+
+func ReplicateCodeGeneration(prompt string) (string, error) {
+	client, clientError := replicate.NewClient(replicate.WithTokenFromEnv())
+	if clientError != nil {
+		return "", clientError
+	}
+
+	input := replicate.PredictionInput{
+		"prompt":         PromptPrefix + prompt,
+		"max_new_tokens": 4096,
+	}
+	webhook := replicate.Webhook{
+		URL:    "https://example.com/webhook",
+		Events: []replicate.WebhookEventType{"start", "completed"},
+	}
+
+	prediction, predictionError := client.Run(context.Background(), "meta/codellama-70b-instruct:a279116fe47a0f65701a8817188601e2fe8f4b9e04a518789655ea7b995851bf", input, &webhook)
 
 	if predictionError != nil {
 		return "", predictionError
