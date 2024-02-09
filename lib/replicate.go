@@ -31,7 +31,7 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "mistralai/mistral-7b-instruct-v0.2:79052a3adbba8116ebc6697dcba67ad0d58feff23e7aeb2f103fc9aa545f9269", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "mistralai/mixtral-8x7b-instruct-v0.1:cf18decbf51c27fed6bbdc3492312c1c903222a56e3fe9ca02d6cbe5198afc10", input, &webhook)
 
 	if predictionError != nil {
 		return "", predictionError
