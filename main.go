@@ -22,7 +22,7 @@ var commands = []api.CreateCommandData{
 	},
 	{
 		Name:        "ask",
-		Description: "Ask Himbot! Cooldown: 2 Minutes.",
+		Description: "Ask Himbot! Cooldown: 1 Minute.",
 		Options: []discord.CommandOption{
 			&discord.StringOption{
 				OptionName:  "prompt",
@@ -33,7 +33,7 @@ var commands = []api.CreateCommandData{
 	},
 	{
 		Name:        "pic",
-		Description: "Generate an image! Cooldown: 1 Minute.",
+		Description: "Generate an image! Cooldown: 2 Minutes.",
 		Options: []discord.CommandOption{
 			&discord.StringOption{
 				OptionName:  "prompt",
