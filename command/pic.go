@@ -15,7 +15,7 @@ import (
 
 func Pic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	// Cooldown Logic
-	allowed, cooldownString := lib.CooldownHandler(*data.Event, "pic", time.Minute*2)
+	allowed, cooldownString := lib.CooldownHandler(*data.Event, "pic", time.Minute*5)
 
 	if !allowed {
 		return lib.ErrorResponse(errors.New(cooldownString))
