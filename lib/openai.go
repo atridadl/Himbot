@@ -37,8 +37,7 @@ func OpenAITextGeneration(prompt string) (string, error) {
 
 	if err != nil {
 		fmt.Printf("Ask command error: %v\n", err)
-		return "", errors.New("there was an error generating the response based on this prompt... please reach out to @himbothyswaggins to fix this issue")
-
+		return "", errors.New("https://fly.storage.tigris.dev/atridad/himbot/no.gif")
 	}
 
 	return resp.Choices[0].Message.Content, nil
@@ -64,7 +63,7 @@ func OpenAIImageGeneration(prompt string, filename string) (*bytes.Buffer, error
 
 	if err != nil {
 		fmt.Printf("Pic command error: %v\n", err)
-		return nil, errors.New("there was an error generating the image based on this prompt... please reach out to @himbothyswaggins to fix this issue")
+		return nil, errors.New("https://fly.storage.tigris.dev/atridad/himbot/hornypolice.gif")
 	}
 
 	imgUrl := imageResponse.Data[0].URL

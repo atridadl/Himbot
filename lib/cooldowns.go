@@ -60,8 +60,13 @@ func (m *CooldownManager) IsOnCooldown(userID string, key string) (bool, time.Du
 
 func CancelCooldown(userID string, key string) {
 	manager := GetInstance()
+
+	// Handle non-existent keys gracefully
+	if _, exists := manager.cooldowns[userID+":"+key]; !exists {
+		return
+	}
+
 	manager.mu.Lock()
 	defer manager.mu.Unlock()
-
 	delete(manager.cooldowns, userID+":"+key)
 }

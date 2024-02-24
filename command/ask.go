@@ -28,7 +28,7 @@ func Ask(ctx context.Context, data cmdroute.CommandData) *api.InteractionRespons
 	}
 
 	if err := data.Options.Unmarshal(&options); err != nil {
-		lib.CancelCooldown(data.Event.User.ID.String(), "ask")
+		lib.CancelCooldown(data.Event.Member.User.ID.String(), "ask")
 		return lib.ErrorResponse(err)
 	}
 
@@ -36,7 +36,7 @@ func Ask(ctx context.Context, data cmdroute.CommandData) *api.InteractionRespons
 
 	if err != nil {
 		fmt.Printf("ChatCompletion error: %v\n", err)
-		lib.CancelCooldown(data.Event.User.ID.String(), "ask")
+		lib.CancelCooldown(data.Event.Member.User.ID.String(), "ask")
 		return &api.InteractionResponseData{
 			Content:         option.NewNullableString("ChatCompletion Error!"),
 			AllowedMentions: &api.AllowedMentions{},
