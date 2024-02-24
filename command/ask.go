@@ -32,7 +32,7 @@ func Ask(ctx context.Context, data cmdroute.CommandData) *api.InteractionRespons
 		return lib.ErrorResponse(err)
 	}
 
-	respString, err := lib.OpenAITextGeneration(options.Prompt)
+	respString, err := lib.ReplicateTextGeneration(options.Prompt)
 
 	if err != nil {
 		fmt.Printf("ChatCompletion error: %v\n", err)

@@ -37,7 +37,7 @@ func Pic(ctx context.Context, data cmdroute.CommandData) *api.InteractionRespons
 	// Concatenate clean username and timestamp to form filename
 	filename := data.Event.Sender().Username + "_" + timestamp + ".jpg"
 
-	imageFile, err := lib.OpenAIImageGeneration(options.Prompt, filename)
+	imageFile, err := lib.ReplicateImageGeneration(options.Prompt, filename)
 
 	if err != nil {
 		lib.CancelCooldown(data.Event.Member.User.ID.String(), "pic")
