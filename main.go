@@ -33,7 +33,7 @@ var commands = []api.CreateCommandData{
 	},
 	{
 		Name:        "pic",
-		Description: "Generate an image! Cooldown: 2 Minutes.",
+		Description: "Generate an image! Cooldown: 5 Minutes.",
 		Options: []discord.CommandOption{
 			&discord.StringOption{
 				OptionName:  "prompt",
