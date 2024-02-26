@@ -22,9 +22,8 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 	}
 
 	input := replicate.PredictionInput{
-		"prompt":          ReplicatePromptPrefix + prompt,
-		"max_new_tokens":  4096,
-		"prompt_template": "<s>[INST] {prompt} [/INST]",
+		"prompt":         ReplicatePromptPrefix + prompt,
+		"max_new_tokens": 4096,
 	}
 
 	webhook := replicate.Webhook{
