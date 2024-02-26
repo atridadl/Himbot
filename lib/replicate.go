@@ -32,7 +32,7 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "mistralai/mixtral-8x7b-instruct-v0.1:cf18decbf51c27fed6bbdc3492312c1c903222a56e3fe9ca02d6cbe5198afc10", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "meta/llama-2-70b-chat:44878be272d384b00155fe821d8534275d5471b88c25dc6e78c97ce3644b1e99", input, &webhook)
 
 	if predictionError != nil {
 		return "", predictionError
@@ -73,10 +73,8 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		"height":                 1024,
 		"prompt":                 prompt,
 		"scheduler":              "K_EULER",
+		"refine":                 "expert_ensemble_refiner",
 		"num_outputs":            1,
-		"guidance_scale":         7.5,
-		"lora_scale":             0.65,
-		"lora_weights":           "https://replicate.delivery/pbxt/hM1H6f93HCVYQq471gZz6EYtRHPMJYAsyxeQXdGnozeDJKOkA/trained_model.tar",
 		"negative_prompt":        "ugly, deformed, noisy, blurry, low contrast, text, BadDream, lowres, low resolution, mutated body parts, extra limbs, mutated body parts, inaccurate hands, too many hands, deformed fingers, too many fingers, deformed eyes, deformed faces, unrealistic faces",
 		"num_inference_steps":    35,
 		"disable_safety_checker": true,
@@ -86,7 +84,7 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "batouresearch/open-dalle-1.1-lora:2ade2cbfc88298b98366a6e361559e11666c17ed415d341c9ae776b30a61b196", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", input, &webhook)
 
 	if predictionError != nil {
 		return nil, predictionError
