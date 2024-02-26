@@ -32,7 +32,7 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "meta/llama-2-13b-chat:f4e2de70d66816a838a89eeeb621910adffb0dd0baba3976c96980970978018d", input, &webhook)
 
 	if predictionError != nil {
 		return "", predictionError
