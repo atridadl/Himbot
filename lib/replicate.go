@@ -72,11 +72,10 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		"width":                  1024,
 		"height":                 1024,
 		"prompt":                 prompt,
-		"scheduler":              "K_EULER",
-		"refine":                 "expert_ensemble_refiner",
 		"num_outputs":            1,
-		"negative_prompt":        "ugly, deformed, noisy, blurry, low contrast, text, BadDream, lowres, low resolution, mutated body parts, extra limbs, mutated body parts, inaccurate hands, too many hands, deformed fingers, too many fingers, deformed eyes, deformed faces, unrealistic faces",
-		"num_inference_steps":    35,
+		"negative_prompt":        "ugly, deformed, noisy, blurry, low contrast, BadDream, lowres, low resolution, mutated body parts, extra limbs, mutated body parts, inaccurate hands, too many hands, deformed fingers, too many fingers, deformed eyes, deformed faces, unrealistic faces",
+		"num_inference_steps":    50,
+		"apply_watermark":        false,
 		"disable_safety_checker": true,
 	}
 	webhook := replicate.Webhook{
@@ -84,7 +83,7 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "lucataco/playground-v2.5-1024px-aesthetic:419269784d9e00c56e5b09747cfc059a421e0c044d5472109e129b746508c365", input, &webhook)
 
 	if predictionError != nil {
 		return nil, predictionError
