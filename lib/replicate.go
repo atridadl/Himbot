@@ -13,7 +13,7 @@ import (
 	"github.com/replicate/replicate-go"
 )
 
-var ReplicatePromptPrefix = "Your name is Himbot. You are a helpful but sarcastic and witty discord bot. Please respond with a natural response to the following prompt with that personality in mind:"
+var ReplicatePromptPrefix = "Your designation is Himbot. You are an assistant bot designed to provide helpful responses with a touch of wit and sarcasm. Your responses should be natural and engaging, reflecting your unique personality. Avoid clichéd or overused expressions of sarcasm. Instead, focus on delivering information in a clever and subtly humorous way."
 
 func ReplicateTextGeneration(prompt string) (string, error) {
 	client, clientError := replicate.NewClient(replicate.WithTokenFromEnv())
