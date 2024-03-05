@@ -74,7 +74,7 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		"prompt":                 prompt,
 		"num_outputs":            1,
 		"negative_prompt":        "ugly, deformed, noisy, blurry, low contrast, BadDream, lowres, low resolution, mutated body parts, extra limbs, mutated body parts, inaccurate hands, too many hands, deformed fingers, too many fingers, deformed eyes, deformed faces, unrealistic faces",
-		"num_inference_steps":    50,
+		"num_inference_steps":    60,
 		"apply_watermark":        false,
 		"disable_safety_checker": true,
 	}
