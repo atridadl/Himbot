@@ -72,7 +72,6 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		"width":                  1024,
 		"height":                 1024,
 		"prompt":                 prompt,
-		"scheduler":              "DPM++2MKarras",
 		"num_outputs":            1,
 		"num_inference_steps":    60,
 		"apply_watermark":        false,
