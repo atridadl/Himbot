@@ -73,8 +73,6 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		"height":                 1024,
 		"prompt":                 prompt,
 		"num_outputs":            1,
-		"num_inference_steps":    60,
-		"apply_watermark":        false,
 		"disable_safety_checker": true,
 	}
 	webhook := replicate.Webhook{
@@ -82,7 +80,7 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "lucataco/playground-v2.5-1024px-aesthetic:419269784d9e00c56e5b09747cfc059a421e0c044d5472109e129b746508c365", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "lucataco/sdxl-lightning-4stepc:727e49a643e999d602a896c774a0658ffefea21465756a6ce24b7ea4165eba6a", input, &webhook)
 
 	if predictionError != nil {
 		return nil, predictionError
