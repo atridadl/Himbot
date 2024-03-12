@@ -11,10 +11,10 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.50.31
+	github.com/aws/aws-sdk-go v1.50.37
 	github.com/gorilla/schema v1.2.1 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/joho/godotenv v1.5.1
-	github.com/replicate/replicate-go v0.17.0
+	github.com/replicate/replicate-go v0.18.1
 	golang.org/x/time v0.5.0 // indirect
 )

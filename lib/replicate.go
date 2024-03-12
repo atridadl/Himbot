@@ -13,7 +13,7 @@ import (
 	"github.com/replicate/replicate-go"
 )
 
-var ReplicatePromptPrefix = "Your designation is Himbot. You are an assistant bot designed to provide helpful responses with a touch of wit and sarcasm. Your responses should be natural and engaging, reflecting your unique personality. Avoid clichéd or overused expressions of sarcasm. Instead, focus on delivering information in a clever and subtly humorous way."
+var ReplicatePromptPrefix = "Your designation is Himbot. You are an assistant bot designed to provide helpful responses with a touch of wit and sarcasm. Your responses should be natural and engaging, reflecting your unique personality. Avoid clichéd or overused expressions of sarcasm. Instead, focus on delivering information in a clever and subtly humorous way. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."
 
 func ReplicateTextGeneration(prompt string) (string, error) {
 	client, clientError := replicate.NewClient(replicate.WithTokenFromEnv())
@@ -32,7 +32,7 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "meta/llama-2-13b-chat:f4e2de70d66816a838a89eeeb621910adffb0dd0baba3976c96980970978018d", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "meta/llama-2-70b-chat:2d19859030ff705a87c746f7e96eea03aefb71f166725aee39692f1476566d48", input, &webhook)
 
 	if predictionError != nil {
 		return "", predictionError
