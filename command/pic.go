@@ -27,7 +27,7 @@ func Pic(ctx context.Context, data cmdroute.CommandData) *api.InteractionRespons
 	}
 
 	if err := data.Options.Unmarshal(&options); err != nil {
-		lib.CancelCooldown(data.Event.Member.User.ID.String(), "pic")
+		lib.CancelTimer(data.Event.Member.User.ID.String(), "pic")
 		return lib.ErrorResponse(err)
 	}
 
@@ -40,7 +40,7 @@ func Pic(ctx context.Context, data cmdroute.CommandData) *api.InteractionRespons
 	imageFile, err := lib.ReplicateImageGeneration(options.Prompt, filename)
 
 	if err != nil {
-		lib.CancelCooldown(data.Event.Member.User.ID.String(), "pic")
+		lib.CancelTimer(data.Event.Member.User.ID.String(), "pic")
 		return lib.ErrorResponse(err)
 	}
 

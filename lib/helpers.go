@@ -9,7 +9,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 )
 
-var manager = NewCooldownManager()
+var manager = NewTimerManager()
 
 // Userish is an interface that captures the common methods you may want to call
 // on either a discord.Member or discord.User, including a display name.
@@ -79,11 +79,11 @@ func CooldownHandler(event discord.InteractionEvent, key string, duration time.D
 		}
 	}
 
-	isOnCooldown, remaining := manager.IsOnCooldown(user.ID().String(), key)
+	isOnCooldown, remaining := manager.TimerRunning(user.ID().String(), key)
 	if isOnCooldown {
 		return false, fmt.Sprintf("You are on cooldown. Please wait for %v", remaining)
 	}
 
-	manager.StartCooldown(user.ID().String(), key, duration)
+	manager.StartTimer(user.ID().String(), key, duration)
 	return true, ""
 }
