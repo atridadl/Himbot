@@ -11,8 +11,8 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.51.3
-	github.com/gorilla/schema v1.2.1 // indirect
+	github.com/aws/aws-sdk-go v1.51.8
+	github.com/gorilla/schema v1.3.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/joho/godotenv v1.5.1
 	github.com/replicate/replicate-go v0.18.1
