@@ -56,11 +56,14 @@ var commands = []api.CreateCommandData{
 }
 
 func main() {
-	godotenv.Load(".env")
 
 	token := os.Getenv("DISCORD_TOKEN")
 	if token == "" {
-		log.Fatalln("No $DISCORD_TOKEN given.")
+		godotenv.Load(".env")
+
+		if token == "" {
+			log.Fatalln("No $DISCORD_TOKEN given.")
+		}
 	}
 
 	h := newHandler(state.New("Bot " + token))
