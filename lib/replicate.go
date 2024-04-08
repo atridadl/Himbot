@@ -13,7 +13,9 @@ import (
 	"github.com/replicate/replicate-go"
 )
 
-var ReplicatePromptPrefix = "Your designation is Himbot. You are an assistant bot designed to provide helpful responses with a touch of wit and sarcasm. Your responses should be natural and engaging, reflecting your unique personality. Avoid clichéd or overused expressions of sarcasm. Instead, focus on delivering information in a clever and subtly humorous way. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."
+var SystemPrompt = "Your name is Himbot. You are an assistant bot designed to provide helpful responses. Your responses should be natural and engaging. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."
+
+var PromptTemplate = `<s>[INST] Using this information:` + SystemPrompt + `answer the following Prompt: {prompt} [/INST]`
 
 func ReplicateTextGeneration(prompt string) (string, error) {
 	client, clientError := replicate.NewClient(replicate.WithTokenFromEnv())
@@ -22,9 +24,9 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 	}
 
 	input := replicate.PredictionInput{
-		"prompt":         prompt,
-		"system_prompt":  ReplicatePromptPrefix,
-		"max_new_tokens": 4096,
+		"prompt":          prompt,
+		"max_new_tokens":  1024,
+		"prompt_template": PromptTemplate,
 	}
 
 	webhook := replicate.Webhook{
@@ -32,7 +34,7 @@ func ReplicateTextGeneration(prompt string) (string, error) {
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "meta/llama-2-70b-chat:2d19859030ff705a87c746f7e96eea03aefb71f166725aee39692f1476566d48", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "mistralai/mixtral-8x7b-instruct-v0.1:5d78bcd7a992c4b793465bcdcf551dc2ab9668d12bb7aa714557a21c1e77041c", input, &webhook)
 
 	if predictionError != nil {
 		return "", predictionError
