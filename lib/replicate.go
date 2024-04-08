@@ -74,7 +74,8 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		"width":                  1024,
 		"height":                 1024,
 		"prompt":                 prompt,
-		"negative_prompt":        "worst quality, normal quality, low quality, low res, blurry, text, watermark, logo, banner, extra digits, cropped, jpeg artifacts, signature, username, error, sketch ,duplicate, monochrome, geometry",
+		"guidance_scale":         7.5,
+		"negative_prompt":        "worst quality, low quality",
 		"num_outputs":            1,
 		"disable_safety_checker": true,
 	}
