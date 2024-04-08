@@ -84,7 +84,7 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "bytedance/sdxl-lightning-4step:727e49a643e999d602a896c774a0658ffefea21465756a6ce24b7ea4165eba6a", input, &webhook)
 
 	if predictionError != nil {
 		return nil, predictionError
