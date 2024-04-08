@@ -74,8 +74,12 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		"width":                  1024,
 		"height":                 1024,
 		"prompt":                 prompt,
-		"num_inference_steps":    4,
-		"negative_prompt":        "worst quality, low quality",
+		"num_inference_steps":    25,
+		"negative_prompt":        "deformed, noisy, blurry, distorted",
+		"scheduler":              "DPMSolver++",
+		"guidance_scale":         3,
+		"prompt_strength":        0.8,
+		"apply_watermark":        false,
 		"num_outputs":            1,
 		"disable_safety_checker": true,
 	}
@@ -84,7 +88,7 @@ func ReplicateImageGeneration(prompt string, filename string) (*bytes.Buffer, er
 		Events: []replicate.WebhookEventType{"start", "completed"},
 	}
 
-	prediction, predictionError := client.Run(context.Background(), "bytedance/sdxl-lightning-4step:727e49a643e999d602a896c774a0658ffefea21465756a6ce24b7ea4165eba6a", input, &webhook)
+	prediction, predictionError := client.Run(context.Background(), "playgroundai/playground-v2.5-1024px-aesthetic:a45f82a1382bed5c7aeb861dac7c7d191b0fdf74d8d57c4a0e6ed7d4d0bf7d24", input, &webhook)
 
 	if predictionError != nil {
 		return nil, predictionError
