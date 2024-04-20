@@ -76,8 +76,6 @@ func newHandler(s *state.State) *handler {
 	// Automatically defer handles if they're slow.
 	h.Use(cmdroute.Deferrable(s, cmdroute.DeferOpts{}))
 	h.AddFunc("ping", command.Ping)
-	h.AddFunc("ask", command.Ask)
-	h.AddFunc("pic", command.Pic)
 	h.AddFunc("hs", command.HS)
 
 	return h
