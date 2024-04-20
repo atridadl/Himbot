@@ -21,28 +21,6 @@ var commands = []api.CreateCommandData{
 		Description: "ping pong!",
 	},
 	{
-		Name:        "ask",
-		Description: "Ask Himbot! Cooldown: 1 Minute.",
-		Options: []discord.CommandOption{
-			&discord.StringOption{
-				OptionName:  "prompt",
-				Description: "The prompt to send to Himbot.",
-				Required:    true,
-			},
-		},
-	},
-	{
-		Name:        "pic",
-		Description: "Generate an image! Cooldown: 5 Minutes.",
-		Options: []discord.CommandOption{
-			&discord.StringOption{
-				OptionName:  "prompt",
-				Description: "The prompt for the image generation.",
-				Required:    true,
-			},
-		},
-	},
-	{
 		Name:        "hs",
 		Description: "This command was your nickname in highschool!",
 		Options: []discord.CommandOption{
