@@ -10,13 +10,11 @@ services:
     pull_policy: build
     ports:
       - "3000:3000"
-    networks:
-      - nginx_default
     environment:
       - DISCORD_TOKEN=$DISCORD_TOKEN
       - COOLDOWN_ALLOW_LIST=$COOLDOWN_ALLOW_LIST
 
 networks:
-  nginx_default:
-    external:
-      name: nginx_default
+  default:
+    external: true
+    name: nginx_default
