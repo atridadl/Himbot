@@ -31,7 +31,7 @@ var (
 		},
 		{
 			Name:        "markov",
-			Description: "Testing markov chains.",
+			Description: "Why did the Markov chain break up with its partner? Because it couldn't handle the past!",
 		},
 	}
 
