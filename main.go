@@ -29,11 +29,16 @@ var (
 				},
 			},
 		},
+		{
+			Name:        "markov",
+			Description: "Testing markov chains.",
+		},
 	}
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"ping": command.PingCommand,
-		"hs":   command.HsCommand,
+		"ping":   command.PingCommand,
+		"hs":     command.HsCommand,
+		"markov": command.MarkovCommand,
 	}
 )
 
