@@ -1,6 +1,6 @@
 module himbot
 
-go 1.23.2
+go 1.23
 
 require github.com/diamondburned/arikawa/v3 v3.4.0
 
