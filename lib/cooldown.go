@@ -48,29 +48,19 @@ func (cm *CooldownManager) CheckCooldown(userID, commandName string) (bool, time
 }
 
 func CheckAndApplyCooldown(s *discordgo.Session, i *discordgo.InteractionCreate, commandName string, duration time.Duration) bool {
-    cooldownManager := GetCooldownManager()
-    user, err := GetUser(i)
-    if err != nil {
-        s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-            Type: discordgo.InteractionResponseChannelMessageWithSource,
-            Data: &discordgo.InteractionResponseData{
-                Content: "Error processing command: " + err.Error(),
-            },
-        })
-        return false
-    }
+	cooldownManager := GetCooldownManager()
+	user, err := GetUser(i)
+	if err != nil {
+		RespondWithError(s, i, "Error processing command: "+err.Error())
+		return false
+	}
 
-    canUse, remaining := cooldownManager.CheckCooldown(user.ID, commandName)
-    if !canUse {
-        s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-            Type: discordgo.InteractionResponseChannelMessageWithSource,
-            Data: &discordgo.InteractionResponseData{
-                Content: fmt.Sprintf("You can use this command again in %v", remaining.Round(time.Second)),
-            },
-        })
-        return false
-    }
+	canUse, remaining := cooldownManager.CheckCooldown(user.ID, commandName)
+	if !canUse {
+		RespondWithError(s, i, fmt.Sprintf("You can use this command again in %v", remaining.Round(time.Second)))
+		return false
+	}
 
-    cooldownManager.SetCooldown(user.ID, commandName, duration)
-    return true
+	cooldownManager.SetCooldown(user.ID, commandName, duration)
+	return true
 }
