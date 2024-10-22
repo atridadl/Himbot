@@ -8,12 +8,10 @@ primary_region = 'ord'
 
 [build]
 
-[http_service]
+[[services]]
 internal_port = 3000
-auto_stop_machines = 'suspend'
-auto_start_machines = true
+protocol = "tcp"
 min_machines_running = 1
-processes = ['app']
 
 [[vm]]
 size = 'shared-cpu-1x'
