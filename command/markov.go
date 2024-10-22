@@ -1,24 +1,15 @@
 package command
 
 import (
-	"himbot/lib"
-	"log"
 	"math/rand"
 	"strings"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	if !lib.CheckAndApplyCooldown(s, i, "markov", 30*time.Second) {
-		return
-	}
-
-	// Get the channel ID from the interaction
+func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) (string, error) {
 	channelID := i.ChannelID
 
-	// Get the number of messages to fetch from the option
 	numMessages := 100 // Default value
 	if len(i.ApplicationCommandData().Options) > 0 {
 		if i.ApplicationCommandData().Options[0].Name == "messages" {
@@ -34,8 +25,7 @@ func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	// Fetch messages
 	allMessages, err := fetchMessages(s, channelID, numMessages)
 	if err != nil {
-		lib.RespondWithError(s, i, "Failed to fetch messages: "+err.Error())
-		return
+		return "", err
 	}
 
 	// Build the Markov chain from the fetched messages
@@ -49,18 +39,7 @@ func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		newMessage = "I couldn't generate a message. The channel might be empty or contain no usable text."
 	}
 
-	// Respond to the interaction with the generated message
-	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: newMessage,
-		},
-	})
-
-	if err != nil {
-		log.Printf("Error responding to interaction: %v", err)
-		lib.RespondWithError(s, i, "An error occurred while processing the command")
-	}
+	return newMessage, nil
 }
 
 func fetchMessages(s *discordgo.Session, channelID string, numMessages int) ([]*discordgo.Message, error) {

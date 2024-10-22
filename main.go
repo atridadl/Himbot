@@ -2,10 +2,12 @@ package main
 
 import (
 	"himbot/command"
+	"himbot/lib"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -44,9 +46,9 @@ var (
 	}
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"ping":   command.PingCommand,
-		"hs":     command.HsCommand,
-		"markov": command.MarkovCommand,
+		"ping":   lib.HandleCommand("ping", 5*time.Second, command.PingCommand),
+		"hs":     lib.HandleCommand("hs", 10*time.Second, command.HsCommand),
+		"markov": lib.HandleCommand("markov", 30*time.Second, command.MarkovCommand),
 	}
 )
 
