@@ -1,16 +1,12 @@
 package command
 
-import (
-	"context"
+import "github.com/bwmarrin/discordgo"
 
-	"github.com/diamondburned/arikawa/v3/api"
-	"github.com/diamondburned/arikawa/v3/api/cmdroute"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
-)
-
-func Ping(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	// Command Logic
-	return &api.InteractionResponseData{
-		Content: option.NewNullableString("Pong!"),
-	}
+func PingCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Pong!",
+		},
+	})
 }

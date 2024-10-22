@@ -1,26 +1,30 @@
 package command
 
 import (
-	"context"
-	"himbot/lib"
+	"fmt"
 
-	"github.com/diamondburned/arikawa/v3/api"
-	"github.com/diamondburned/arikawa/v3/api/cmdroute"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/bwmarrin/discordgo"
 )
 
-func HS(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	var options struct {
-		Arg string `discord:"nickname"`
+func HsCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	options := i.ApplicationCommandData().Options
+	nickname := options[0].StringValue()
+
+	var username string
+	if i.Member != nil {
+		username = i.Member.User.Username
+	} else if i.User != nil {
+		username = i.User.Username
+	} else {
+		username = "User"
 	}
 
-	if err := data.Options.Unmarshal(&options); err != nil {
-		return lib.ErrorResponse(err)
-	}
+	response := fmt.Sprintf("%s was %s's nickname in highschool!", nickname, username)
 
-	user := lib.GetUserObject(*data.Event)
-
-	return &api.InteractionResponseData{
-		Content: option.NewNullableString(options.Arg + " was " + user.DisplayName() + "'s nickname in highschool!"),
-	}
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: response,
+		},
+	})
 }
