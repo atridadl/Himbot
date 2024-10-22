@@ -1,28 +1,27 @@
 package lib
 
 import (
-	"net"
-	"os"
+	"fmt"
+	"log"
 
-	"github.com/diamondburned/arikawa/v3/api"
-	"github.com/diamondburned/arikawa/v3/discord"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/bwmarrin/discordgo"
 )
 
-func ErrorResponse(err error) *api.InteractionResponseData {
-	var content string
-	switch e := err.(type) {
-	case *net.OpError:
-		content = "**Network Error:** " + e.Error()
-	case *os.PathError:
-		content = "**File Error:** " + e.Error()
-	default:
-		content = "**Error:** " + err.Error()
+// respondWithError sends an error message as a response to the interaction
+func RespondWithError(s *discordgo.Session, i *discordgo.InteractionCreate, message string) {
+	log.Printf("Responding with error: %s", message)
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: message,
+			Flags:   discordgo.MessageFlagsEphemeral,
+		},
+	})
+	if err != nil {
+		log.Printf("Error sending error response: %v", err)
 	}
+}
 
-	return &api.InteractionResponseData{
-		Content:         option.NewNullableString(content),
-		Flags:           discord.EphemeralMessage,
-		AllowedMentions: &api.AllowedMentions{},
-	}
+func ThrowWithError(command, message string) error {
+	return fmt.Errorf("error in command '%s': %s", command, message)
 }

@@ -1,72 +1,76 @@
 package lib
 
 import (
+	"fmt"
 	"sync"
 	"time"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 var (
-	mu       sync.Mutex
-	instance *TimerManager
+	once     sync.Once
+	instance *CooldownManager
 )
 
-type TimerManager struct {
-	timers map[string]time.Time
-	mu     sync.Mutex
+type CooldownManager struct {
+	cooldowns map[string]time.Time
+	mu        sync.Mutex
 }
 
-func NewTimerManager() *TimerManager {
-	return &TimerManager{
-		timers: make(map[string]time.Time),
-	}
-}
-
-func GetInstance() *TimerManager {
-	mu.Lock()
-	defer mu.Unlock()
-
-	if instance == nil {
-		instance = &TimerManager{
-			timers: make(map[string]time.Time),
+func GetCooldownManager() *CooldownManager {
+	once.Do(func() {
+		instance = &CooldownManager{
+			cooldowns: make(map[string]time.Time),
 		}
-	}
-
+	})
 	return instance
 }
 
-func (m *TimerManager) StartTimer(userID string, key string, duration time.Duration) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	m.timers[userID+":"+key] = time.Now().Add(duration)
+func (cm *CooldownManager) SetCooldown(userID, commandName string, duration time.Duration) {
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
+	cm.cooldowns[userID+":"+commandName] = time.Now().Add(duration)
 }
 
-func (m *TimerManager) TimerRunning(userID string, key string) (bool, time.Duration) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
+func (cm *CooldownManager) CheckCooldown(userID, commandName string) (bool, time.Duration) {
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
 
-	timerEnd, exists := m.timers[userID+":"+key]
-	if !exists {
-		return false, 0
+	key := userID + ":" + commandName
+	if cooldownEnd, exists := cm.cooldowns[key]; exists {
+		if time.Now().Before(cooldownEnd) {
+			return false, time.Until(cooldownEnd)
+		}
+		delete(cm.cooldowns, key)
 	}
-
-	if time.Now().After(timerEnd) {
-		delete(m.timers, userID+":"+key)
-		return false, 0
-	}
-
-	return true, time.Until(timerEnd)
+	return true, 0
 }
 
-func CancelTimer(userID string, key string) {
-	manager := GetInstance()
+func CheckAndApplyCooldown(s *discordgo.Session, i *discordgo.InteractionCreate, commandName string, duration time.Duration) bool {
+    cooldownManager := GetCooldownManager()
+    user, err := GetUser(i)
+    if err != nil {
+        s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+            Type: discordgo.InteractionResponseChannelMessageWithSource,
+            Data: &discordgo.InteractionResponseData{
+                Content: "Error processing command: " + err.Error(),
+            },
+        })
+        return false
+    }
 
-	// Handle non-existent keys gracefully
-	if _, exists := manager.timers[userID+":"+key]; !exists {
-		return
-	}
+    canUse, remaining := cooldownManager.CheckCooldown(user.ID, commandName)
+    if !canUse {
+        s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+            Type: discordgo.InteractionResponseChannelMessageWithSource,
+            Data: &discordgo.InteractionResponseData{
+                Content: fmt.Sprintf("You can use this command again in %v", remaining.Round(time.Second)),
+            },
+        })
+        return false
+    }
 
-	manager.mu.Lock()
-	defer manager.mu.Unlock()
-	delete(manager.timers, userID+":"+key)
+    cooldownManager.SetCooldown(user.ID, commandName, duration)
+    return true
 }

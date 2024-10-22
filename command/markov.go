@@ -1,20 +1,22 @@
 package command
 
 import (
+	"himbot/lib"
 	"log"
 	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-// MarkovCommand generates a random message using Markov chains
 func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	log.Println("MarkovCommand called")
+	if !lib.CheckAndApplyCooldown(s, i, "markov", 30*time.Second) {
+		return
+	}
 
 	// Get the channel ID from the interaction
 	channelID := i.ChannelID
-	log.Printf("Channel ID: %s", channelID)
 
 	// Get the number of messages to fetch from the option
 	numMessages := 100 // Default value
@@ -28,9 +30,40 @@ func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			}
 		}
 	}
-	log.Printf("Fetching up to %d messages", numMessages)
 
-	// Fetch messages in batches
+	// Fetch messages
+	allMessages, err := fetchMessages(s, channelID, numMessages)
+	if err != nil {
+		lib.RespondWithError(s, i, "Failed to fetch messages: "+err.Error())
+		return
+	}
+
+	// Build the Markov chain from the fetched messages
+	chain := buildMarkovChain(allMessages)
+
+	// Generate a new message using the Markov chain
+	newMessage := generateMessage(chain)
+
+	// Check if the generated message is empty and provide a fallback message
+	if newMessage == "" {
+		newMessage = "I couldn't generate a message. The channel might be empty or contain no usable text."
+	}
+
+	// Respond to the interaction with the generated message
+	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: newMessage,
+		},
+	})
+
+	if err != nil {
+		log.Printf("Error responding to interaction: %v", err)
+		lib.RespondWithError(s, i, "An error occurred while processing the command")
+	}
+}
+
+func fetchMessages(s *discordgo.Session, channelID string, numMessages int) ([]*discordgo.Message, error) {
 	var allMessages []*discordgo.Message
 	var lastMessageID string
 
@@ -42,9 +75,7 @@ func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 		batch, err := s.ChannelMessages(channelID, batchSize, lastMessageID, "", "")
 		if err != nil {
-			log.Printf("Error fetching messages: %v", err)
-			respondWithError(s, i, "Failed to fetch messages")
-			return
+			return nil, err
 		}
 
 		if len(batch) == 0 {
@@ -59,34 +90,7 @@ func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		}
 	}
 
-	log.Printf("Fetched %d messages", len(allMessages))
-
-	// Build the Markov chain from the fetched messages
-	chain := buildMarkovChain(allMessages)
-	log.Printf("Built Markov chain with %d entries", len(chain))
-
-	// Generate a new message using the Markov chain
-	newMessage := generateMessage(chain)
-	log.Printf("Generated message: %s", newMessage)
-
-	// Check if the generated message is empty and provide a fallback message
-	if newMessage == "" {
-		newMessage = "I couldn't generate a message. The channel might be empty or contain no usable text."
-	}
-
-	// Respond to the interaction with the generated message
-	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: newMessage,
-		},
-	})
-
-	if err != nil {
-		log.Printf("Error responding to interaction: %v", err)
-		return
-	}
-	log.Println("Successfully responded to interaction")
+	return allMessages, nil
 }
 
 // buildMarkovChain creates a Markov chain from a list of messages
@@ -94,13 +98,11 @@ func buildMarkovChain(messages []*discordgo.Message) map[string][]string {
 	chain := make(map[string][]string)
 	for _, msg := range messages {
 		words := strings.Fields(msg.Content)
-		log.Printf("Processing message: %s", msg.Content)
 		// Build the chain by associating each word with the word that follows it
 		for i := 0; i < len(words)-1; i++ {
 			chain[words[i]] = append(chain[words[i]], words[i+1])
 		}
 	}
-	log.Printf("Built chain with %d entries", len(chain))
 	return chain
 }
 
@@ -131,19 +133,4 @@ func generateMessage(chain map[string][]string) string {
 	}
 
 	return strings.Join(words, " ")
-}
-
-// respondWithError sends an error message as a response to the interaction
-func respondWithError(s *discordgo.Session, i *discordgo.InteractionCreate, message string) {
-	log.Printf("Responding with error: %s", message)
-	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: message,
-			Flags:   discordgo.MessageFlagsEphemeral,
-		},
-	})
-	if err != nil {
-		log.Printf("Error sending error response: %v", err)
-	}
 }
