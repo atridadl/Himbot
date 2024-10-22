@@ -81,6 +81,7 @@ func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Content: newMessage,
 		},
 	})
+
 	if err != nil {
 		log.Printf("Error responding to interaction: %v", err)
 		return
@@ -139,6 +140,7 @@ func respondWithError(s *discordgo.Session, i *discordgo.InteractionCreate, mess
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: message,
+			Flags:   discordgo.MessageFlagsEphemeral,
 		},
 	})
 	if err != nil {
