@@ -12,18 +12,32 @@ import (
 func MarkovCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	log.Println("MarkovCommand called")
 
-	// Get the channel ID from the interaction
-	channelID := i.ChannelID
-	log.Printf("Channel ID: %s", channelID)
+    // Get the channel ID from the interaction
+    channelID := i.ChannelID
+    log.Printf("Channel ID: %s", channelID)
 
-	// Fetch the last 100 messages from the channel
-	messages, err := s.ChannelMessages(channelID, 100, "", "", "")
-	if err != nil {
-		log.Printf("Error fetching messages: %v", err)
-		respondWithError(s, i, "Failed to fetch messages")
-		return
-	}
-	log.Printf("Fetched %d messages", len(messages))
+    // Get the number of messages to fetch from the option
+    numMessages := 100 // Default value
+    if len(i.ApplicationCommandData().Options) > 0 {
+        if i.ApplicationCommandData().Options[0].Name == "messages" {
+            numMessages = int(i.ApplicationCommandData().Options[0].IntValue())
+            if numMessages <= 0 {
+                numMessages = 100
+            } else if numMessages > 1000 {
+                numMessages = 1000
+            }
+        }
+    }
+    log.Printf("Fetching %d messages", numMessages)
+
+    // Fetch the specified number of messages from the channel
+    messages, err := s.ChannelMessages(channelID, numMessages, "", "", "")
+    if err != nil {
+        log.Printf("Error fetching messages: %v", err)
+        respondWithError(s, i, "Failed to fetch messages")
+        return
+    }
+    log.Printf("Fetched %d messages", len(messages))
 
 	// Build the Markov chain from the fetched messages
 	chain := buildMarkovChain(messages)

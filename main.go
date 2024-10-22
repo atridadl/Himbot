@@ -32,6 +32,14 @@ var (
 		{
 			Name:        "markov",
 			Description: "Why did the Markov chain break up with its partner? Because it couldn't handle the past!",
+			Options: []*discordgo.ApplicationCommandOption{
+		        {
+		            Type:        discordgo.ApplicationCommandOptionInteger,
+		            Name:        "messages",
+		            Description: "Number of messages to use (default: 100, max: 1000)",
+		            Required:    false,
+		        },
+		    },
 		},
 	}
 
