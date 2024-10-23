@@ -4,14 +4,13 @@ A discord bot written in Go.
 
 ## It's dangerous to go alone! Take this!
 
--   Install Go 1.21.5 or higher (required)
+-   Install Go 1.23.2 or higher (required)
 
 ## Running Locally
 
 -   Copy .env.example and rename to .env
 -   Create a Discord Bot with all gateway permissions enabled
 -   Generate a token for this discord bot and paste it in the .env for DISCORD_TOKEN
--   Generate and provide an Replicate token and paste it in the .env for REPLICATE_API_TOKEN
 -   Run `go run main.go` to run locally
 
 ## Adding the bot to a server
